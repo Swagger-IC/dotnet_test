@@ -1,0 +1,38 @@
+﻿@using Rise.Shared.Models
+@namespace Rise.Client.Components
+
+
+@code {
+    [Parameter] public required List<Product> Producten { get; set; }
+}
+
+<div class="profiel-producten">
+    <h2>Bestelde items</h2>
+    <div class="profiel-content">
+        <ul>
+            @foreach (var product in Producten)
+            {
+                <li class="product-item">
+                    <div class="product-info">
+                        <span class="product-naam">@product.Naam</span>
+                        <span class="product-stock">In stock: @product.AantalInStock</span>
+                    </div>
+                    <div class="product-bestel">
+                        <button>Bestel</button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+<style>
+    .profiel-producten {
+        width: 100%;
+    }
+
+    .profiel-producten ul {
+        list-style-type: none;
+        padding: 0;
+    }
+</style>

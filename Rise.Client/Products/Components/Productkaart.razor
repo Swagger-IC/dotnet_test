@@ -1,0 +1,11 @@
+﻿<div class="col-xxl-3 col-xl-4 col-md-6 col-sm-12">
+    <div class="card mb-2 kaart" data-id="@ProductId" @onclick="@(() => HandleClick())">
+         <div class="image-container">
+            <img class="rounded-top" src=@ImageUrl alt="@Naam" />
+        </div>
+        <div class="card-body text-truncate">
+            <h6 id="naam" class="card-title">@Naam</h6>
+            <p class="card-text">Lokaal: @Lokaal</p>
+        </div>
+    </div>
+</div>

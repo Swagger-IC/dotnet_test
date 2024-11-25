@@ -1,0 +1,19 @@
+﻿@page "/add-product"
+@attribute [Authorize]
+@using Rise.Client.Products.Components
+@using Rise.Shared.Products
+@inject NavigationManager NavigationManager
+@inject IProductService ProductService
+
+<PageTitle>360° Zorg | Product Toevoegen</PageTitle>
+
+<div class="container">
+    <h1 class="my-4">Product Toevoegen</h1>
+    
+    <div class="row">
+        <div class="mb-4">
+            <ProductToevoegenKaart />
+        </div>
+    </div>
+</div>
+

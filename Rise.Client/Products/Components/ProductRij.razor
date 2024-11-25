@@ -1,0 +1,7 @@
+<tr id="productrij" class="rij" data-id=@product.Id @onclick="@(() => HandleClick())">
+    <td>@product.Name</td>
+    <td>@product.Quantity</td>
+    <td>@product.Location</td>
+    <td>@(product.Reusable ? "Uitlenen" : "Uitscannen")</td>
+    <td>@product.Barcode</td>
+</tr>

@@ -1,0 +1,63 @@
+@page "/"
+@attribute [Authorize]
+@using Rise.Client.Products.Components
+@using Rise.Shared.Products
+
+<PageTitle>360° Zorg | Productenlijst</PageTitle>
+@if (products == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+<div class="row d-flex justify-content-between">
+    <div class="col-12 col-md-6 mb-2">
+        <button class="@GetButton1Class() me-3 btn btn-outline-dark"
+            @onclick="LoadNonReusableProductsAsync">Uitscannen</button>
+        <button class="@GetButton2Class() btn btn-outline-dark" @onclick="LoadReusableProductsAsync">Uitlenen</button>
+        
+            @* <AuthorizeView Roles="voorraadbeheerder">*@
+                <button class="btn btn-outline-dark ms-2" id="toevoegen" @onclick="AddProduct">
+                    <i class="bi bi-plus-lg"></i> 
+                </button>
+            @*</AuthorizeView>*@
+    </div>
+    <div class="col-12 col-md-6 mb-2 zoekbalk">
+        <input type="text" id="product-search" class="form-control" @oninput="OnFilterInput"
+            @bind="ProductenlijstStatus.Filter" placeholder="Filter: naam, lokaal, barcode of keywords" />
+    </div>
+</div>
+    <i class="@GetToggleIconClass() text-dark switchIcoon" @onclick="ToggleView"></i>
+
+    @if (ProductenlijstStatus.TableView)
+    {
+        <table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Naam</th>
+            <th scope="col">In stock</th>
+            <th scope="col">Lokaal</th>
+            <th scope="col">Type</th>
+            <th scope="col">Barcode</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in products)
+                {
+                    <ProductRij product=product OnClick="@(() => OnProductClick(product.Id))" />
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="row">
+    @foreach (var product in products)
+            {
+                <Productkaart ProductId="@product.Id" ImageUrl="@product.ImgUrl" Naam="@product.Name" Lokaal="@product.Location"
+                    OnClick="@(() => OnProductClick(product.Id))" />
+            }
+        </div>
+    }
+    <Paginatie OnPageChanged="LoadPageData" OnItemsPerPageChanged="LoadPageDataWithNewCount" />
+}

@@ -1,0 +1,24 @@
+﻿@page "/profiel"
+@using Rise.Client.Users.Components
+@attribute [Authorize]
+<PageTitle>360° Zorg | Profiel</PageTitle>
+<div class="container pb-2">
+
+    <div class="row justify-content-between align-items-center">
+        <div class="col">
+            <h1>Welkom, @Voornaam!</h1>
+        </div>
+        <div class="col text-end">
+            <img src="./images/userprofile-icon.png" alt="Profiel afbeelding" />
+            <p>@Rol</p>
+        </div>
+    </div>
+
+      <!-- Persoonlijke Info Card -->
+    <div class="mb-4">
+        <PersoonlijkInfoKaart Voornaam="@Voornaam" Naam="@Naam" Email="@Email" />
+    </div>
+   
+
+   
+</div>

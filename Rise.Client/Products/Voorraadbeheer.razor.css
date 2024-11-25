@@ -1,0 +1,14 @@
+.bestelButton {
+  background-color: black;
+  color: white;
+  border: 1px solid white;
+  border-radius: 25px;
+  transition: background-color 0.3s ease;
+  padding: 0.25rem 0.5rem;
+}
+
+.bestelButton:hover {
+  background-color: lightgrey;
+  color: black;
+  cursor: pointer;
+}

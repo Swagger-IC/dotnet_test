@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+<AuthorizeView>
+    <Authorized>
+        @* Hello, @context.User.FindFirst("given_name") + @context.User.FindFirst("family_name")! *@
+        Hallo, @context.User.FindFirst("given_name")?.Value @context.User.FindFirst("family_name")?.Value
+        <img src="@context.User.FindFirst("picture")?.Value" alt="User picture"/>
+        <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
+    </Authorized>
+</AuthorizeView>

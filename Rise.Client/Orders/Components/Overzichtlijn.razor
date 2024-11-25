@@ -1,0 +1,9 @@
+﻿<div class="d-flex justify-content-between align-items-center border-bottom py-2">
+    <p class="mb-0">@Lijn.Name</p>
+    <div class="d-flex ">
+        <input type="number" value=@Lijn.Amount min="1" max="@Lijn.InStock" @onchange="(e) => OnAmountChanged(e)" class="form-control me-2"/>
+        <button id="trash" class="btn btn-sm btn-outline-danger" @onclick="_ => Winkelmand.RemoveItem(Lijn)">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+﻿<div class="col-12 col-xl-6 mb-4">
+    <div class="card border-0 shadow">
+        <h2 class="pt-3 ps-3 pb-1">@Product.Name</h2>
+        <img class="card-img-top d-block mx-auto" src=@Product.ImgUrl alt="@Product.Name"/>
+        <div class="card-body">
+            <h4>Productinformatie</h4>
+            <p>@Product.Description</p>
+            <p class="text-muted">
+                Lokaal: @Product.Location <br>
+                Aantal in stock: @Product.Quantity <br>
+                Type: @(Product.Reusable ? "Uitlenen" : "Uitscannen")
+                <br>Barcode: @Product.Barcode
+            </p>
+            <label class="form-label">Aantal:</label>
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    <input type="number" @bind=@amount min="1" max="@Product.Quantity" class="form-control"/>
+                </div>
+                <div class="col-auto">
+                    @* Onderscheid maken uitscanbare en uitleenbare items *@
+                    @if (!Product.Reusable)
+                    {
+                        <button class="btn btn-dark" @onclick="AddToCart">Voeg toe aan overzicht</button>
+                    }
+                    @* Voor uitleenbare items, geen winkelmand, onmiddelijk periode laten toekennen en mogelijkheid om te annuleren *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

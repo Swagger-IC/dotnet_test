@@ -1,0 +1,55 @@
+@page "/voorraadbeheer"
+@using Rise.Shared.Products
+
+<PageTitle>360° Zorg | Voorraadbeheer</PageTitle>
+
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h5 class="text-secondary mb-4">Voorraadbeheer</h5>
+
+            @if (products == null)
+            {
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Naam</th>
+                                <th id="quantity-header" @onclick="SortByQuantity" style="cursor: pointer;">Aantal in stock @GetSortIcon()</th>
+                                <th>Leverancier</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in products)
+                            {
+                                <tr>
+                                    <td>@product.Name</td>
+                                    <td>@product.Quantity</td>
+                                    <td>@product.LeverancierEmail</td>
+                                    <td>
+                                        <span class="@GetStockStatus(product) d-inline-block" style="width: 15px; height: 15px; border-radius: 50%;"></span>
+                                    </td>
+                                    <td>
+                                        <button class="bestelButton" @onclick="() => OnOrderClick(product.Id)">
+                                            <i class="bi bi-cart-plus"></i> Bestel
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

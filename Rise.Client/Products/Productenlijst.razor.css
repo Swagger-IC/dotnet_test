@@ -1,0 +1,10 @@
+.switchIcoon {
+    cursor: pointer; 
+    font-size: xx-large;
+}
+
+@media (min-width: 800px) {
+    .zoekbalk{
+        text-align: right;
+    }
+}
