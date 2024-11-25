@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="Microsoft.Playwright" Version="*" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.48.0" />
     <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.48.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit.Analyzers" Version="3.9.0" />
@@ -21,10 +21,6 @@
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Rise.Persistence\Rise.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

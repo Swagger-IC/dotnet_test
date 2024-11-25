@@ -19,11 +19,6 @@ else
             <th scope="col">Firstname</th>
             <th scope="col">Lastname</th>
             <th scope="col">Blocked</th>
-            <th>
-                <button class="btn btn-outline-dark ms-2" id="toevoegenUser" @onclick="AddGebruiker">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            </th>
         </tr>
     </thead>
     <tbody>
@@ -38,4 +33,12 @@ else
             }
         </tbody>
     </table>
+}
+
+@code {
+    private IEnumerable<UserDto>? users;
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetUsersAsync();
+    }
 }
