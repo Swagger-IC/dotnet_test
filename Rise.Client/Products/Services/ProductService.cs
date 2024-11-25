@@ -49,6 +49,17 @@ public class ProductService : IProductService
         return (response!.Products, response.TotalCount);
     }
 
+
+    public async Task IncreaseQuantityAsync(int productId, int quantityToAdd) {
+        var response = await httpClient.PutAsJsonAsync($"product/{productId}/increase", quantityToAdd);
+    
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(message);
+        }
+    } 
+
     public async Task<bool> CreateProductAsync(CreateProductDto createDto)
     {
         var response = await httpClient.PostAsJsonAsync("product", createDto);
@@ -68,6 +79,19 @@ public class ProductService : IProductService
         // Hier gebruik je je HttpClient om de afbeelding te uploaden
         return await httpClient.PostAsync("product/upload", content);
     }
+
+    public async Task<bool> DeleteProductAsync(int id)
+    {
+        var response = await httpClient.DeleteAsync($"product/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
 }
 
 

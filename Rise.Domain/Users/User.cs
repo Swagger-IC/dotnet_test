@@ -11,9 +11,7 @@ namespace Rise.Domain.Users
         private string voornaam = default!;
         private string naam = default!;
         private string email = default!;
-        private string telNr = default!;
-        private Rol rol = default!; 
-        //wachtwoord en mogelijk lijst met producten moeten nog komen
+       
 
         public required string Naam
         {
@@ -31,18 +29,6 @@ namespace Rise.Domain.Users
         {
             get => email;
             set => email = Guard.Against.NullOrWhiteSpace(value);
-        }
-
-        public required string TelNr
-        {
-            get => telNr;
-            set => telNr = Guard.Against.NullOrWhiteSpace(value);
-        }
-
-        public required Rol Rol
-        {
-            get => rol;
-            set => rol = value;
         }
     }
 }

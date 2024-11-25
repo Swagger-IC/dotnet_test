@@ -50,19 +50,12 @@ public class Seeder
     {
         dbContext.Users.RemoveRange(dbContext.Users);
 
-        var availableRoles = Enum.GetValues(typeof(Rol)).Cast<Rol>().ToList();
-
-
-        var users = Enumerable.Range(1, 10)
-                              .Select(i => new User
-                              {
-                                  Voornaam = $"Voornaam {i}",
-                                  Naam = $"Naam {i}",
-                                  Email = $"user{i}@example.com",
-                                  TelNr = $"12345",
-                                  Rol = availableRoles[i % availableRoles.Count]
-                              })
-                              .ToList();
+        var users = new List<User>
+            {
+                new User { Voornaam = "Michiel", Email = "michiel_murphy@outlook.com", Naam = "Murphy" },
+                new User { Voornaam = "Corneel", Email = "corneel.verstraeten@student.hogent.be", Naam = "Verstraeten" },
+                new User { Voornaam = "Denzell", Email = "denzell@gmail.com", Naam = "Boelens" }
+            };
         dbContext.Users.AddRange(users);
         dbContext.SaveChanges();
     }
