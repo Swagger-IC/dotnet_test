@@ -2,7 +2,7 @@
 set -euo pipefail
 
 #clean up docker
-sudo docker system prune -f
+docker system prune -f
 
 mkdir -p tempdir
 mkdir -p tempdir/Rise.Client
@@ -75,11 +75,11 @@ _EOF_
 
 cd tempdir || exit
 # Build the Docker image, specifying the current directory as the build context
-sudo docker build -t dotnet .
-sudo docker run -t -d -p 5000:5000 -p 5001:5001 --name dotnetapp dotnet
+docker build -t dotnet .
+docker run -t -d -p 5000:5000 -p 5001:5001 --name dotnetapp dotnet
 
 #remove tempdir
-sudo rm -rf tempdir
+rm -rf tempdir
 
 # List the running Docker containers
-sudo docker ps -a
+docker ps -a
