@@ -3,14 +3,17 @@ using Microsoft.AspNetCore.Components.Web;
 using Rise.Client;
 using Rise.Client.Products.Services;
 using Rise.Shared.Products;
-using Rise.Client.Users;
 using Rise.Shared.Users;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Client.Auth;
 using Blazored.LocalStorage;
 using Blazored.Modal;
+using Blazored.Toast;
 using Rise.Client.Orders;
+using Rise.Shared.Roles;
+using Rise.Client.Users.Services;
 using Rise.Shared.Leveranciers;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -22,6 +25,7 @@ builder.Services.AddBlazoredModal();
 builder.Services.AddScoped<ProductenlijstStatus>();
 builder.Services.AddScoped<Winkelmand>();
 
+builder.Services.AddBlazoredToast();
 
 builder.Services.AddHttpClient<IProductService, ProductService>(client =>
 {
@@ -36,6 +40,11 @@ builder.Services.AddHttpClient<ILeverancierService, LeverancierService>(client =
 builder.Services.AddHttpClient<IUserService, UserService>(client =>
 {
     client.BaseAddress = new Uri($"{builder.HostEnvironment.BaseAddress}");
+}).AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();;
+
+builder.Services.AddHttpClient<IRolService, RolService>(client =>
+{
+    client.BaseAddress = new Uri($"{builder.HostEnvironment.BaseAddress}api/");
 }).AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();;
 
 builder.Services.AddCascadingAuthenticationState();

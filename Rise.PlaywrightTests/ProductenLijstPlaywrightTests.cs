@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
 namespace Rise.Client.Pages;
@@ -111,5 +112,51 @@ public class ProductenlijstPlaywrightTests : PageTest
 
 
         Assert.IsNotNull(productKaart, "Productkaart zou moeten zijn geselecteerd.");
+    }
+
+    [Test]
+    public async Task ProductVerwijderen_Should_ProductVerwijderdWorden()
+    {
+        // Vul het zoekveld in om een specifiek product te zoeken
+        await Page.FillAsync("#product-search", "Slimme Gast");
+        await Task.Delay(1000);
+
+        // Wacht totdat de productkaarten geladen zijn
+        await Page.WaitForSelectorAsync("div.kaart");
+
+        // Zoek de kaart van het product
+        var productKaart = await Page.QuerySelectorAsync("div.kaart:has-text('Slimme Gast')");
+
+        // Controleer of het product zichtbaar is voordat we het verwijderen
+        Assert.IsNotNull(productKaart, "Het product zou zichtbaar moeten zijn voordat we het verwijderen.");
+
+        // Klik op de verwijderknop binnen de productkaart
+        var deleteButton = await productKaart.QuerySelectorAsync(".btn-danger");
+        if (deleteButton != null)
+        {
+            // Stel een dialooglistener in voor het confirm dialoog
+            Page.Dialog += async (sender, e) =>
+            {
+                if (e.Type == DialogType.Confirm)
+                {
+                    // Bevestig de actie door op "OK" te klikken
+                    await e.AcceptAsync();  // Gebruik AcceptAsync() in plaats van Accept()
+                }
+            };
+
+            // Klik op de verwijderknop
+            await deleteButton.ClickAsync();
+
+            // Wacht tot het product verdwijnt uit de lijst
+            await Page.WaitForSelectorAsync("div.kaart", new PageWaitForSelectorOptions { State = WaitForSelectorState.Hidden });
+
+            // Controleer of de productkaart nu niet meer zichtbaar is
+            var deletedProductKaart = await Page.QuerySelectorAsync("div.kaart:has-text('Chirurgische handschoenen')");
+            Assert.IsNull(deletedProductKaart, "Het product zou verwijderd moeten zijn."); ;
+        }
+        else
+        {
+            Assert.Fail("De verwijderknop was niet gevonden voor het product.");
+        }
     }
 }

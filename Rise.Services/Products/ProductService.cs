@@ -4,6 +4,7 @@ using Rise.Shared.Products;
 using Rise.Domain.Products;
 using FluentValidation;
 
+
 namespace Rise.Services.Products;
 
 public class ProductService : IProductService
@@ -141,7 +142,8 @@ public class ProductService : IProductService
         return GetProductsByReusabilityAsync(true, paginanummer, aantal);
     }
 
-    public async Task<IEnumerable<ProductLeverancierDto>> GetLowStockProductsAsync() {
+    public async Task<IEnumerable<ProductLeverancierDto>> GetLowStockProductsAsync()
+    {
         IQueryable<ProductLeverancierDto> query = dbContext.Products
             .Include(x => x.Leverancier)
             .Where(x => x.Quantity < x.MinStock)
@@ -163,6 +165,26 @@ public class ProductService : IProductService
 
         return products;
     }
+    public async Task IncreaseQuantityAsync(int productId, int quantityToAdd)
+    {
+        if (quantityToAdd <= 0)
+        {
+            throw new ArgumentException("Aantal moet groter zijn dan 0.", nameof(quantityToAdd));
+        }
+
+        Product? product = await dbContext.Products.SingleOrDefaultAsync(x => x.Id == productId);
+
+        if (product is null)
+        {
+            throw new KeyNotFoundException($"Product met Id {productId} werd niet gevonden.");
+        }
+
+        product.Quantity += quantityToAdd;
+
+        await dbContext.SaveChangesAsync();
+
+    }
+
 
     public async Task<bool> CreateProductAsync(CreateProductDto createDto)
     {
@@ -198,4 +220,19 @@ public class ProductService : IProductService
     {
         throw new NotImplementedException();
     }
+
+    public async Task<bool> DeleteProductAsync(int id)
+    {
+        var product = await dbContext.Products.FindAsync(id);
+        if (product == null)
+        {
+            return false; // Product niet gevonden
+        }
+
+        dbContext.Products.Remove(product); // Verwijder het product
+        await dbContext.SaveChangesAsync(); // Sla de wijzigingen op
+
+        return true; // Succesvol verwijderd
+    }
+
 }
