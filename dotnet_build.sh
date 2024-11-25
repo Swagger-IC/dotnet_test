@@ -46,30 +46,22 @@ COPY ["Rise.Client.Tests/Rise.Client.Tests.csproj", "Rise.Client.Tests/"]
 COPY ["Rise.Server.Tests/Rise.Server.Tests.csproj", "Rise.Server.Tests/"]
 COPY ["Rise.Domain.Tests/Rise.Domain.Tests.csproj", "Rise.Domain.Tests/"]
 
-# Copy the rest of the application files
-COPY . .
+# Restore as distinct layers
+RUN dotnet restore -a $targetarch
 
-# Restore the NuGet packages
-RUN dotnet restore
-RUN dotnet publish -c Release -o out
+# copy and publish app and libraries
+COPY . .
+RUN dotnet publish "Rise.Server/Rise.Server.csproj" --no-restore -c Release -o /src/out
+
 
 # Use the official .NET 8 runtime image to create a runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/runtime:8.0
 
 # Set the working directory for the application
 WORKDIR /app
 
-# Copy the build output from the build image
 COPY --from=build /src/out .
-
-# Expose the port 5000 and 5001
-EXPOSE 5000
-EXPOSE 5001
-
-#set the port for the application
-ENV ASPNETCORE_URLS=http://+:5000
-
-# Set the entry point to run the app in development mode
+USER $APP_UID
 ENTRYPOINT ["dotnet", "Rise.Server.dll"]
 _EOF_
 
