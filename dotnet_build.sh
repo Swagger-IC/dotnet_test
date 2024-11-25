@@ -41,8 +41,17 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copy the .sln file and the project files into the container
-COPY ["Rise.Server/Rise.Server.csproj", "Rise.Server/"]
+COPY ["Rise.sln", "./"]
+COPY ["Rise.Client/Rise.Client.csproj", "Rise.Client/"]
+COPY ["Rise.Client.Tests/Rise.Client.Tests.csproj", "Rise.Client.Tests/"]
+COPY ["Rise.Domain/Rise.Domain.csproj", "Rise.Domain/"]
+COPY ["Rise.Domain.Tests/Rise.Domain.Tests.csproj", "Rise.Domain.Tests/"]
 COPY ["Rise.Persistence/Rise.Persistence.csproj", "Rise.Persistence/"]
+COPY ["Rise.PlaywrightTests/Rise.PlaywrightTests.csproj", "Rise.PlaywrightTests/"]
+COPY ["Rise.Server/Rise.Server.csproj", "Rise.Server/"]
+COPY ["Rise.Server.Tests/Rise.Server.Tests.csproj", "Rise.Server.Tests/"]
+COPY ["Rise.Services/Rise.Services.csproj", "Rise.Services/"]
+COPY ["Rise.Shared/Rise.Shared.csproj", "Rise.Shared/"]
 
 # Restore as distinct layers
 RUN dotnet restore "Rise.Server/Rise.Server.csproj"
@@ -65,7 +74,7 @@ RUN dotnet tool install --global dotnet-ef
 #var
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
-RUN dotnet ef database update --startup-project Rise.Server --project Rise.Persistence
+RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persistence
 
 WORKDIR "/app/Rise.Server"
 
@@ -90,7 +99,7 @@ _EOF_
 cd tempdir || exit
 # Build the Docker image, specifying the current directory as the build context
 sudo docker build -t dotnet .
-sudo docker run -t -d -p 5000:5000 -p 5001:5001 --name dotnetapp dotnet
+sudo docker run -t -d -p 5000:5000 --name dotnetapp dotnet
 
 #remove tempdir
 sudo rm -rf tempdir
