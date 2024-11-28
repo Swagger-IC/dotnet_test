@@ -78,10 +78,10 @@ RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persi
 
 # Run tests during the build phase
 WORKDIR "/app"
-RUN dotnet test "Rise.Client.Tests/Rise.Client.Tests.csproj" --no-build --verbosity normal
-RUN dotnet test "Rise.Domain.Tests/Rise.Domain.Tests.csproj" --no-build --verbosity normal
-RUN dotnet test "Rise.PlaywrightTests/Rise.PlaywrightTests.csproj" --no-build --verbosity normal
-RUN dotnet test "Rise.Server.Tests/Rise.Server.Tests.csproj" --no-build --verbosity normal
+RUN dotnet test "Rise.Client.Tests/"
+RUN dotnet test "Rise.Domain.Tests/"
+RUN dotnet test "Rise.PlaywrightTests/"
+RUN dotnet test "Rise.Server.Tests/"
 
 # Publish the application
 WORKDIR "/app/Rise.Server"
