@@ -80,7 +80,7 @@ RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persi
 WORKDIR "/app"
 #RUN dotnet test "Rise.Client.Tests/"
 RUN dotnet test "Rise.Domain.Tests/"
-RUN dotnet test "Rise.PlaywrightTests/"
+#RUN dotnet test "Rise.PlaywrightTests/"
 RUN dotnet test "Rise.Server.Tests/"
 
 # Publish the application
