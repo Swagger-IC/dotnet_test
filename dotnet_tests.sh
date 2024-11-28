@@ -45,8 +45,16 @@ COPY ["Rise.Services/Rise.Services.csproj", "Rise.Services/"]
 COPY ["Rise.Shared/Rise.Shared.csproj", "Rise.Shared/"]
 
 # Restore as distinct layers
-RUN dotnet restore "Rise.Server/Rise.Server.csproj"
+RUN dotnet restore "Rise.Client/Rise.Client.csproj"
+RUN dotnet restore "Rise.Client.Tests/Rise.Client.Tests.csproj"
+RUN dotnet restore "Rise.Domain/Rise.Domain.csproj"
+RUN dotnet restore "Rise.Domain.Tests/Rise.Domain.Tests.csproj"
 RUN dotnet restore "Rise.Persistence/Rise.Persistence.csproj"
+RUN dotnet restore "Rise.PlaywrightTests/Rise.PlaywrightTests.csproj"
+RUN dotnet restore "Rise.Server/Rise.Server.csproj"
+RUN dotnet restore "Rise.Server.Tests/Rise.Server.Tests.csproj"
+RUN dotnet restore "Rise.Services/Rise.Services.csproj"
+RUN dotnet restore "Rise.Shared/Rise.Shared.csproj"
 
 # Copy remaining files
 COPY . .
