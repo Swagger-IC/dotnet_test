@@ -1,34 +1,24 @@
 #!/bin/bash
 set -euo pipefail
 
-#clean up docker
-sudo docker system prune -f
+# Clean up unused Docker resources
+docker system prune -f
 
+# Create the temporary directory
 mkdir -p tempdir
-mkdir -p tempdir/Rise.Client
-mkdir -p tempdir/Rise.Client.Tests
-mkdir -p tempdir/Rise.Domain
-mkdir -p tempdir/Rise.Domain.Tests
-mkdir -p tempdir/Rise.Persistence
-mkdir -p tempdir/Rise.PlaywrightTests
-mkdir -p tempdir/Rise.Server
-mkdir -p tempdir/Rise.Server.Tests
-mkdir -p tempdir/Rise.Services
-mkdir -p tempdir/Rise.Shared
 
-#copy the content of the folder
-declare -a folders=("Rise.Client" "Rise.Client.Tests" "Rise.Domain" "Rise.Domain.Tests" "Rise.Persistence" "Rise.PlaywrightTests" "Rise.Server" "Rise.Server.Tests" "Rise.Services" "Rise.Shared")
+# Sync files, excluding unnecessary ones
+rsync -av --delete \
+  --exclude 'bin/' \
+  --exclude 'obj/' \
+  --exclude 'README' \
+  --exclude '.gitignore' \
+  --exclude '.git/' \
+  ./ tempdir/
 
-for folder in "${folders[@]}"; do
-  echo "Copying $folder files"
-  cp -r "$folder"/* "tempdir/$folder"
-done
-
-#copy the sln file to tempdir
-cp Rise.sln tempdir
-
+# Create the Dockerfile dynamically in tempdir
 cat > tempdir/Dockerfile << _EOF_
-#Use aspnet voor .net runtime
+# Use aspnet for .NET runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
@@ -57,7 +47,7 @@ COPY ["Rise.Shared/Rise.Shared.csproj", "Rise.Shared/"]
 RUN dotnet restore "Rise.Server/Rise.Server.csproj"
 RUN dotnet restore "Rise.Persistence/Rise.Persistence.csproj"
 
-# copy remaining files
+# Copy remaining files
 COPY . .
 
 # Change repository
@@ -68,41 +58,51 @@ RUN dotnet build "Rise.Server.csproj" -c Release -o /app/build
 
 WORKDIR "/app"
 
-# install dotnet tools in build image
+# Install dotnet tools in build image
 RUN dotnet tool install --global dotnet-ef
 
-#var
-ENV PATH="${PATH}:/root/.dotnet/tools"
+# Add tools path to environment
+ENV PATH="\${PATH}:/root/.dotnet/tools"
 
+# Apply database migrations
 RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persistence
 
-WORKDIR "/app/Rise.Server"
+# Run tests during the build phase
+WORKDIR "/app"
+RUN dotnet test "Rise.Client.Tests/Rise.Client.Tests.csproj" --no-build --verbosity normal
+RUN dotnet test "Rise.Domain.Tests/Rise.Domain.Tests.csproj" --no-build --verbosity normal
+RUN dotnet test "Rise.PlaywrightTests/Rise.PlaywrightTests.csproj" --no-build --verbosity normal
+RUN dotnet test "Rise.Server.Tests/Rise.Server.Tests.csproj" --no-build --verbosity normal
 
-# publish the application
+# Publish the application
+WORKDIR "/app/Rise.Server"
 RUN dotnet publish "Rise.Server.csproj" -c Release -o /app/publish
 
-FROM base AS FINAL
+FROM base AS final
 WORKDIR /app
 
-#copy the published files
+# Copy the published files
 COPY --from=build /app/publish .
 
-# .net tool path
-ENV PATH="${PATH}:/root/.dotnet/tools"
+# Add tools path to environment
+ENV PATH="\${PATH}:/root/.dotnet/tools"
 ENV ASPNETCORE_URLS=http://+:5000
 
-
-#start the application
+# Start the application
 ENTRYPOINT ["dotnet", "Rise.Server.dll"]
 _EOF_
 
-cd tempdir || exit
-# Build the Docker image, specifying the current directory as the build context
-sudo docker build -t dotnet .
-sudo docker run -t -d -p 5000:5000 --name dotnetapp dotnet
+# Build the Docker image, tagging it with the current Git commit hash for versioning
+GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
+docker build -t dotnet:$GIT_COMMIT_HASH tempdir
 
-#remove tempdir
-sudo rm -rf tempdir
+# Stop and remove any running container with the same name
+if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
+  docker rm -f dotnetapp
+fi
+
+# Run the new container
+docker run -t -d -p 5000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
 
 # List the running Docker containers
-sudo docker ps -a | grep dotnetapp
+docker ps -a | grep
