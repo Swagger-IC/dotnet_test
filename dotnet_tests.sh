@@ -95,7 +95,7 @@ COPY --from=build /app/publish .
 
 # Add tools path to environment
 ENV PATH="\${PATH}:/root/.dotnet/tools"
-ENV ASPNETCORE_URLS=http://+:6000
+ENV ASPNETCORE_URLS=http://+:5000
 
 # Start the application
 ENTRYPOINT ["dotnet", "Rise.Server.dll"]
@@ -111,7 +111,7 @@ if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnet
 fi
 
 # Run the new container
-docker run -t -d -p 6000:6000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
+docker run -t -d -p 6000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
 
 # List the running Docker containers
 docker ps -a | grep dotnetapp
