@@ -54,7 +54,7 @@ else
         <div class="row">
     @foreach (var product in products)
             {
-                <Productkaart OnProductDeleted="RefreshProductList" ProductId="@product.Id" ImageUrl="@product.ImgUrl" Naam="@product.Name" Lokaal="@product.Location"
+                <Productkaart ProductId="@product.Id" ImageUrl="@product.ImgUrl" Naam="@product.Name" Lokaal="@product.Location"
                     OnClick="@(() => OnProductClick(product.Id))" />
             }
         </div>

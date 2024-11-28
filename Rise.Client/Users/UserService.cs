@@ -1,9 +1,8 @@
 using System;
-using System.Net.Http;
 using System.Net.Http.Json;
 using Rise.Shared.Users;
 
-namespace Rise.Client.Users.Services;
+namespace Rise.Client.Users;
 
 public class UserService(HttpClient httpClient) : IUserService
 {
@@ -15,26 +14,15 @@ public class UserService(HttpClient httpClient) : IUserService
 
     public async Task<UserDto> GetUserById(int id)
     {
-
+        
         var gebruiker = await httpClient.GetFromJsonAsync<UserDto>($"user/{id}");
-        return gebruiker!;
+        return gebruiker!; 
     }
 
-
-    public async Task<UserDto> GetUserByEmailAsync(string email)
+    
+    public async Task<UserDto> GetUserByEmail(string email)
     {
         var gebruiker = await httpClient.GetFromJsonAsync<UserDto>($"user/email/{email}");
         return gebruiker!;
-    }
-
-    public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
-    {
-        var response = await httpClient.PostAsJsonAsync("user", createUserDto);
-
-        response.EnsureSuccessStatusCode();
-
-        var createdUser = await response.Content.ReadFromJsonAsync<UserDto>();
-
-        return createdUser!;
     }
 }

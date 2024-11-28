@@ -1,71 +1,67 @@
 ﻿using Auth0.ManagementApi;
+using Auth0.ManagementApi.Models;
+using Auth0.ManagementApi.Paging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rise.Shared.Users;
-using FluentValidation;
-using System;
 
-namespace Rise.Server.Controllers
+namespace Rise.Server.Controllers;
+
+
+[ApiController]
+[Route("[controller]")]
+[Authorize(Roles = "Administrator")]
+public class UserController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    [Authorize(Roles = "Administrator")]
-    public class UserController : ControllerBase
+    // private readonly IUserService userService;
+
+    // public UserController(IUserService userService)
+    // {
+    //     this.userService = userService;
+    // }
+
+    // [HttpGet]
+    // public async Task<IEnumerable<UserDto>> Get()
+    // {
+    //     var users = await userService.GetUsersAsync();
+    //     return users;
+    // }
+
+    // [HttpGet("{id}")]
+    // public async Task<ActionResult<UserDto>> GetUserById(int id)
+    // {
+    //     var user = await userService.GetUserById(id);
+    //     if (user == null)
+    //         return NotFound();
+    //     return user;
+    // }
+
+    // [HttpGet("email/{email}")]
+    // public async Task<ActionResult<UserDto>> GetUserByEmail(string email)
+    // {
+    //     var user = await userService.GetUserByEmail(email);
+    //     if (user == null)
+    //         return NotFound();
+    //     return user;
+    // }
+
+    private readonly IManagementApiClient _managementApiClient;
+
+    public UserController(IManagementApiClient managementApiClient)
     {
-        private readonly IUserService _userService;
+        _managementApiClient = managementApiClient;
+    }
 
-        public UserController(IUserService userService)
+    [HttpGet]
+    public async Task<IEnumerable<UserDto>> GetUsers()
+    {
+        var users = await _managementApiClient.Users.GetAllAsync(new GetUsersRequest(), new PaginationInfo());
+        return users.Select(x => new UserDto
         {
-            _userService = userService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
-        {
-            var users = await _userService.GetUsersAsync();
-            return Ok(users);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<UserDto>> CreateUser([FromBody] CreateUserDto createDto)
-        {
-            if (createDto == null)
-            {
-                return BadRequest("Gebruiker gegevens zijn verplicht.");
-            }
-
-            try
-            {
-                var user = await _userService.CreateUserAsync(createDto);
-                return CreatedAtAction(nameof(GetUserByEmail), new { email = user.Email }, user);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Errors.Select(e => e.ErrorMessage));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Er is iets misgegaan bij het aanmaken van de gebruiker. {ex.Message}");
-            }
-        }
-
-        [HttpGet("{email}")]
-        public async Task<ActionResult<UserDto?>> GetUserByEmail(string email)
-        {
-            try
-            {
-                var user = await _userService.GetUserByEmailAsync(email);
-                if (user == null) return NotFound();
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Er is iets misgegaan bij het ophalen van de gebruiker. {ex.Message}");
-            }
-        }
+            Email = x.Email,
+            FirstName = x.FirstName,
+            LastName = x.LastName,
+            IsBlocked = x.Blocked ?? false,
+        });
     }
 }

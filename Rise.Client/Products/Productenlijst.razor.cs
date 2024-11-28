@@ -126,20 +126,4 @@ public partial class Productenlijst
     {
         NavigationManager.NavigateTo("/add-product");
     }
-
-    private async Task RefreshProductList()
-    {
-        if (ProductenlijstStatus.Filter != string.Empty)
-        {
-            await LoadProductsAsync(); // Als er een filter is, laad je de gefilterde producten
-        }
-        else if (ProductenlijstStatus.UitScannen)
-        {
-            await LoadNonReusableProductsAsync(); // Laad producten die niet uitleenbaar zijn
-        }
-        else
-        {
-            await LoadReusableProductsAsync(); // Laad producten die uitleenbaar zijn
-        }
-    }
 }

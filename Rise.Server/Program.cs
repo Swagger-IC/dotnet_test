@@ -5,18 +5,14 @@ using Rise.Services.Products;
 using Rise.Shared.Products;
 using Rise.Services.Leveranciers;
 using Rise.Shared.Leveranciers;
-using Rise.Shared.Users;
-using Rise.Services.Users;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Auth0Net.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using FluentValidation.AspNetCore;
 using FluentValidation;
-using Blazored.Toast;
+using FluentValidation.AspNetCore;
 using Rise.Server;
-
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -89,14 +85,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ILeverancierService, LeverancierService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Fluentvalidation
-builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDto.Validator>();
-builder.Services.AddFluentValidationAutoValidation();
-
-builder.Services.AddBlazoredToast();
-
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
