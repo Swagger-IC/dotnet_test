@@ -6,7 +6,7 @@ docker system prune -f
 
 # Initialize Docker Swarm (if not initialized already)
 if ! docker info | grep -q 'Swarm: active'; then
-  docker swarm init
+  docker swarm init --advertise-addr eth1
 fi
 
 # Variables
