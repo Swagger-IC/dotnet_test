@@ -1,25 +1,34 @@
 #!/bin/bash
 set -euo pipefail
 
-# Clean up Docker
+# Clean up unused Docker resources
 docker system prune -f
 
 # Initialize Docker Swarm (if not initialized already)
 if ! docker info | grep -q 'Swarm: active'; then
-  docker swarm init --advertise-addr eth1
+  docker swarm init
 fi
 
-mkdir -p tempdir
-mkdir -p tempdir/Rise.Client
-mkdir -p tempdir/Rise.Client.Tests
-mkdir -p tempdir/Rise.Domain
-mkdir -p tempdir/Rise.Domain.Tests
-mkdir -p tempdir/Rise.Persistence
-mkdir -p tempdir/Rise.PlaywrightTests
-mkdir -p tempdir/Rise.Server
-mkdir -p tempdir/Rise.Server.Tests
-mkdir -p tempdir/Rise.Services
-mkdir -p tempdir/Rise.Shared
+# Variables
+SERVICE_NAME="dotnetapp"
+IMAGE_NAME="dotnet"
+IMAGE_VERSION=$(date +"%Y%m%d%H%M%S") # Timestamp for unique tagging
+FULL_IMAGE="$IMAGE_NAME:$IMAGE_VERSION"
+
+# Create the temporary directory if it doesn't exist
+if [ ! -d tempdir ]; then
+  mkdir -p tempdir
+fi
+
+# Sync files, excluding unnecessary ones
+rsync -av --delete \
+  --exclude 'bin/' \
+  --exclude 'obj/' \
+  --exclude 'README.md' \
+  --exclude '.gitignore' \
+  --exclude '.git/' \
+  --exclude 'dotnet_tests.sh' \
+  ./ tempdir/
 
 # Copy the content of the folders
 declare -a folders=("Rise.Client" "Rise.Client.Tests" "Rise.Domain" "Rise.Domain.Tests" "Rise.Persistence" "Rise.PlaywrightTests" "Rise.Server" "Rise.Server.Tests" "Rise.Services" "Rise.Shared")
@@ -57,19 +66,9 @@ COPY ["Rise.Server.Tests/Rise.Server.Tests.csproj", "Rise.Server.Tests/"]
 COPY ["Rise.Services/Rise.Services.csproj", "Rise.Services/"]
 COPY ["Rise.Shared/Rise.Shared.csproj", "Rise.Shared/"]
 
-# Restore as distinct layers
-RUN dotnet restore "Rise.Client/Rise.Client.csproj"
-RUN dotnet restore "Rise.Client.Tests/Rise.Client.Tests.csproj"
-RUN dotnet restore "Rise.Domain/Rise.Domain.csproj"
-RUN dotnet restore "Rise.Domain.Tests/Rise.Domain.Tests.csproj"
-RUN dotnet restore "Rise.Persistence/Rise.Persistence.csproj"
-RUN dotnet restore "Rise.PlaywrightTests/Rise.PlaywrightTests.csproj"
 RUN dotnet restore "Rise.Server/Rise.Server.csproj"
-RUN dotnet restore "Rise.Server.Tests/Rise.Server.Tests.csproj"
-RUN dotnet restore "Rise.Services/Rise.Services.csproj"
-RUN dotnet restore "Rise.Shared/Rise.Shared.csproj"
+RUN dotnet restore "Rise.Persistence/Rise.Persistence.csproj"
 
-# Copy remaining files
 COPY . .
 
 WORKDIR "/app/Rise.Server"
@@ -102,14 +101,18 @@ _EOF_
 # Navigate to tempdir
 cd tempdir || exit
 
-# Build the Docker image
-docker build -t dotnet .
+# Build the Docker image with a unique tag
+docker build -t $FULL_IMAGE .
 
-# Create the Swarm service
-docker service create --name dotnetapp --publish 5000:5000 dotnet
-
-# Remove the temporary directory
-rm -rf tempdir
+# Deploy or update the service
+if docker service ls --format '{{.Name}}' | grep -q "^$SERVICE_NAME\$"; then
+  echo "Updating existing service $SERVICE_NAME with image $FULL_IMAGE..."
+  docker service update --image $FULL_IMAGE $SERVICE_NAME
+else
+  echo "Creating new service $SERVICE_NAME with image $FULL_IMAGE..."
+  docker service create --name $SERVICE_NAME --publish 5000:5000 --replicas 1 $FULL_IMAGE
+fi
 
 # List the running Docker services
 docker service ls
+
