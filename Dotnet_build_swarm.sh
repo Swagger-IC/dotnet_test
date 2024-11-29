@@ -122,3 +122,5 @@ docker system prune -f
 # List the running Docker services
 docker service ls
 
+# List the docker containers
+docker ps -a
