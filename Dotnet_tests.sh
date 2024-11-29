@@ -17,6 +17,8 @@ rsync -av --delete \
   --exclude 'dotnet_tests.sh' \
   ./ tempdir/
 
+sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
+
 # Create the Dockerfile dynamically in tempdir
 cat > tempdir/Dockerfile << _EOF_
 # Use aspnet for .NET runtime
