@@ -113,6 +113,12 @@ else
   docker service create --name $SERVICE_NAME --publish 5000:5000 --replicas 1 $FULL_IMAGE
 fi
 
+# Wait for 15 seconds for the service to start
+sleep 15
+
+# Clean up unused Docker resources
+docker system prune -f
+
 # List the running Docker services
 docker service ls
 
