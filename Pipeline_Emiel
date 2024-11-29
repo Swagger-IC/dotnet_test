@@ -1,0 +1,14 @@
+node {
+    stage('Tests') {
+        build 'Dotnet_tests'
+    }
+    stage('Preparation') {
+        catchError(buildResult: 'SUCCESS') {
+            sh 'docker stop dotnettests'
+            sh 'docker rm dotnettests'
+        }
+    }
+    stage('Build_swarm') {
+        build 'Dotnet_build_swarm'
+    }
+}
