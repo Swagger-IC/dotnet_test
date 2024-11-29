@@ -30,17 +30,6 @@ rsync -av --delete \
   --exclude 'dotnet_tests.sh' \
   ./ tempdir/
 
-# Copy the content of the folders
-declare -a folders=("Rise.Client" "Rise.Client.Tests" "Rise.Domain" "Rise.Domain.Tests" "Rise.Persistence" "Rise.PlaywrightTests" "Rise.Server" "Rise.Server.Tests" "Rise.Services" "Rise.Shared")
-
-for folder in "${folders[@]}"; do
-  echo "Copying $folder files"
-  cp -r "$folder"/* "tempdir/$folder"
-done
-
-# Copy the solution file to tempdir
-cp Rise.sln tempdir
-
 sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
 
 # Create the Dockerfile
