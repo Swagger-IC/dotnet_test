@@ -1,6 +1,7 @@
 using System.Security.Claims;
+using System.Text.Json;
 
-namespace Client.Auth;
+namespace Rise.Client.Auth;
 public static class ClaimsPrincipalExtensions
 {
     public static string GetFirstname(this ClaimsPrincipal principal)
@@ -50,4 +51,20 @@ public static class ClaimsPrincipalExtensions
 
         return principal.FindFirst("name")?.Value!;
     }
+    public static string GetUserId(this ClaimsPrincipal principal)
+    {
+        if (principal == null)
+            throw new ArgumentNullException(nameof(principal));
+
+        var userMetadataClaim = principal.FindFirst("user_metadata")?.Value;
+
+        if (userMetadataClaim != null)
+        {
+            var userMetadata = JsonSerializer.Deserialize<JsonElement>(userMetadataClaim);
+            return userMetadata.GetProperty("UserId").GetInt32().ToString();
+        }
+
+        return null;
+    }
+
 }

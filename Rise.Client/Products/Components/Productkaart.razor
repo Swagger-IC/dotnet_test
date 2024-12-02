@@ -6,6 +6,12 @@
         <div class="card-body text-truncate">
             <h6 id="naam" class="card-title">@Naam</h6>
             <p class="card-text">Lokaal: @Lokaal</p>
+
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-danger" @onclick="DeleteProduct" @onclick:stopPropagation>
+                    <i class="fa fa-trash"></i> 
+                </button>
+            </div>
         </div>
     </div>
 </div>

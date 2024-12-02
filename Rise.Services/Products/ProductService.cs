@@ -4,6 +4,7 @@ using Rise.Shared.Products;
 using Rise.Domain.Products;
 using FluentValidation;
 
+
 namespace Rise.Services.Products;
 
 public class ProductService : IProductService
@@ -141,7 +142,8 @@ public class ProductService : IProductService
         return GetProductsByReusabilityAsync(true, paginanummer, aantal);
     }
 
-    public async Task<IEnumerable<ProductLeverancierDto>> GetLowStockProductsAsync() {
+    public async Task<IEnumerable<ProductLeverancierDto>> GetLowStockProductsAsync()
+    {
         IQueryable<ProductLeverancierDto> query = dbContext.Products
             .Include(x => x.Leverancier)
             .Where(x => x.Quantity < x.MinStock)
@@ -163,6 +165,26 @@ public class ProductService : IProductService
 
         return products;
     }
+    public async Task IncreaseQuantityAsync(int productId, int quantityToAdd)
+    {
+        if (quantityToAdd <= 0)
+        {
+            throw new ArgumentException("Aantal moet groter zijn dan 0.", nameof(quantityToAdd));
+        }
+
+        Product? product = await dbContext.Products.SingleOrDefaultAsync(x => x.Id == productId);
+
+        if (product is null)
+        {
+            throw new KeyNotFoundException($"Product met Id {productId} werd niet gevonden.");
+        }
+
+        product.Quantity += quantityToAdd;
+
+        await dbContext.SaveChangesAsync();
+
+    }
+
 
     public async Task<bool> CreateProductAsync(CreateProductDto createDto)
     {
@@ -198,4 +220,100 @@ public class ProductService : IProductService
     {
         throw new NotImplementedException();
     }
+
+    public async Task<ProductDto> GetProductByBarcodeAsync(string barcode)
+    {
+        if (string.IsNullOrWhiteSpace(barcode))
+        {
+            throw new ArgumentException("Barcode mag niet leeg zijn.", nameof(barcode));
+        }
+
+        var product = await dbContext.Products
+            .Where(p => p.Barcode == barcode)
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Location = p.Location,
+                Description = p.Description,
+                Reusable = p.Reusable,
+                Quantity = p.Quantity,
+                Barcode = p.Barcode,
+                MinStock = p.MinStock,
+                Keywords = p.Keywords,
+                ImgUrl = p.ImgUrl
+            })
+            .FirstOrDefaultAsync();
+
+        if (product == null)
+        {
+            throw new KeyNotFoundException($"Geen product gevonden met barcode: {barcode}");
+        }
+
+        return product;
+    }
+
+    public async Task<bool> DecreaseQuantitiesAsync(Dictionary<int, int> productQuantities)
+    {
+        if (productQuantities == null || !productQuantities.Any())
+        {
+            throw new ArgumentException("De lijst met producten mag niet leeg zijn.", nameof(productQuantities));
+        }
+
+        // Haal alle betrokken producten op
+        var productIds = productQuantities.Keys;
+        var products = await dbContext.Products
+            .Where(p => productIds.Contains(p.Id))
+            .ToListAsync();
+
+        // Controleer of alle opgegeven product-IDs bestaan
+        foreach (var productId in productIds)
+        {
+            if (!products.Any(p => p.Id == productId))
+            {
+                throw new KeyNotFoundException($"Product met ID {productId} is niet gevonden.");
+            }
+        }
+
+        // Verwerk elke producthoeveelheid
+        foreach (var (productId, amount) in productQuantities)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentException($"De hoeveelheid voor product met ID {productId} moet groter zijn dan nul.");
+            }
+
+            var product = products.First(p => p.Id == productId);
+
+            if (product.Quantity < amount)
+            {
+                throw new InvalidOperationException($"De voorraad van product met ID {productId} is onvoldoende om deze hoeveelheid te verminderen.");
+            }
+
+            // Verlaag de voorraad
+            product.Quantity -= amount;
+        }
+
+        // Sla de wijzigingen op in de database
+        dbContext.Products.UpdateRange(products);
+        await dbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> DeleteProductAsync(int id)
+    {
+        var product = await dbContext.Products.FindAsync(id);
+        if (product == null)
+        {
+            return false; // Product niet gevonden
+        }
+
+        dbContext.Products.Remove(product); // Verwijder het product
+        await dbContext.SaveChangesAsync(); // Sla de wijzigingen op
+
+        return true; // Succesvol verwijderd
+
+    }
+
 }

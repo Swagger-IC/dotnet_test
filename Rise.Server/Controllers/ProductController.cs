@@ -65,6 +65,33 @@ public class ProductController : ControllerBase
         return Ok(new { products, totalCount });
     }
 
+    [HttpPut("{productId}/increase")]
+    // [Authorize(Roles = "VoorraadBeheerder")]
+    public async Task<IActionResult> IncreaseQuantity(int productId, [FromBody] int quantityToAdd)
+    {
+        Console.WriteLine($"Aantal in stock voor product met id {productId} verhogen met {quantityToAdd}...");
+
+        try
+        {
+            await productService.IncreaseQuantityAsync(productId, quantityToAdd);
+            Console.WriteLine($"Aantal in stock geupdate");
+            return Ok(new { Message = "Aantal in stock geupdate." });
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Meegegeven aantal is niet geldig");
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            Console.WriteLine($"Product met id {productId} niet gevonden");
+            return NotFound(new { Message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "Error tijdens toevoegen aan aantal in stock", Details = ex.Message });
+        }
+    }
     [HttpPost]
     // [Authorize(Roles = "VoorraadBeheerder")]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto createDto)
@@ -111,5 +138,78 @@ public class ProductController : ControllerBase
             return StatusCode(500, $"Er is een fout opgetreden bij het uploaden van de afbeelding: {ex.Message}");
         }
     }
+
+    [HttpGet("barcode/{barcode}")]
+    public async Task<ActionResult<ProductDto>> GetProductByBarcode(string barcode)
+    {
+        if (string.IsNullOrWhiteSpace(barcode))
+        {
+            return BadRequest("Barcode mag niet leeg zijn.");
+        }
+
+        try
+        {
+            var product = await productService.GetProductByBarcodeAsync(barcode);
+            if (product == null)
+            {
+                return NotFound($"Geen product gevonden met barcode: {barcode}");
+            }
+
+            return Ok(product);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Er is een fout opgetreden bij het ophalen van het product: {ex.Message}");
+        }
+    }
+
+    [HttpPost("decreaseQuantities")]
+    public async Task<IActionResult> DecreaseProductQuantities([FromBody] Dictionary<int, int> productQuantities)
+    {
+        if (productQuantities == null || !productQuantities.Any())
+        {
+            return BadRequest("De lijst met producten mag niet leeg zijn.");
+        }
+
+        try
+        {
+            // Verlaag de hoeveelheden via de service
+            await productService.DecreaseQuantitiesAsync(productQuantities);
+
+            return Ok("De hoeveelheden van de opgegeven producten zijn succesvol verlaagd.");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Er is een fout opgetreden: {ex.Message}");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(int id)
+    {
+        try
+        {
+            var success = await productService.DeleteProductAsync(id);
+            if (!success)
+            {
+                return NotFound("Product niet gevonden.");
+            }
+
+            return NoContent(); // 204 StatusCode, betekent dat de verwijdering succesvol was maar er geen content wordt geretourneerd.
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Er is iets misgegaan bij het verwijderen van het product: {ex.Message}");
+        }
+    }
+
 
 }

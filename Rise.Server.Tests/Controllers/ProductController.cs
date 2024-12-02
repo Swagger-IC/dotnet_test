@@ -6,6 +6,10 @@ using Xunit;
 using Xunit.Abstractions;
 using System.Text.Json;
 using Rise.Shared.Products;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Rise.Shared.Users;
+using System.Net.Http.Json;
 
 public class ProductControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
@@ -490,6 +494,91 @@ public class ProductControllerTests : IClassFixture<CustomWebApplicationFactory<
         Assert.Empty(products);
 
         Assert.Equal(0, totaal);
+    }
+
+    [Fact]
+    public async Task IncreaseQuantity_ValidProductId_ReturnsSuccess()
+    {
+        int productId = 1;
+        int quantityToAdd = 5;
+
+        var content = new StringContent(quantityToAdd.ToString(), Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PutAsync($"/api/product/{productId}/increase", content);
+
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine(responseBody);
+
+        var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
+        Assert.Equal("Aantal in stock geupdate.", jsonResponse.GetProperty("message").GetString());
+    
+        var productResponse = await _httpClient.GetAsync($"/api/product/{productId}");
+        productResponse.EnsureSuccessStatusCode();
+        var productBody = await productResponse.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true  // deserialization niet hoofdlettergevoelig
+        };
+
+        var product = JsonSerializer.Deserialize<ProductDto>(productBody, options);
+
+        Assert.NotNull(product);
+        Assert.Equal(15, product.Quantity); 
+    }
+
+    [Fact]
+    public async Task IncreaseQuantity_InvalidQuantity_ReturnsBadRequest()
+    {
+        int productId = 1;
+        int invalidQuantity = 0;
+
+        var content = new StringContent(invalidQuantity.ToString(), Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PutAsync($"/api/product/{productId}/increase", content);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine(responseBody);
+
+        var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
+        Assert.Equal("Aantal moet groter zijn dan 0. (Parameter 'quantityToAdd')", jsonResponse.GetProperty("message").GetString());
+    }
+
+    [Fact]
+    [Authorize(Roles = "Administrator")]
+    public async Task Create_CreatesNewUser()
+    {
+        // Arrange: Create a new User object
+        var newUser = new CreateUserDto
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@example.com",
+            Password = "SecurePassword123!",
+            RoleId = "rol_4ofpSMHqJNRw40YZ"
+        };
+
+        // Act: Send a POST request to create the user
+        var response = await _httpClient.PostAsJsonAsync("user", newUser);
+
+        // Assert: Check if the response indicates success
+        response.EnsureSuccessStatusCode(); // Expecting 201 Created
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _output.WriteLine(responseBody);
+
+        // Optionally, parse the response if the API returns the created user
+        var createdUser = JsonSerializer.Deserialize<UserDto>(responseBody, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        Assert.NotNull(createdUser);
+        Assert.Equal(newUser.Email, createdUser.Email);
+
     }
 
 

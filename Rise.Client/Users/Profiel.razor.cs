@@ -1,8 +1,7 @@
-using Rise.Shared.Models;
 using Rise.Shared.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Client.Auth;
+using Rise.Client.Auth;
 
 namespace Rise.Client.Users;
 
@@ -24,6 +23,5 @@ public partial class Profiel
         Rol = user.GetRole();
         Naam = user.GetLastname();
         Email = user.GetEmail();
-
     }
 }

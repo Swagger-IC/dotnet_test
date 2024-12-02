@@ -168,4 +168,25 @@ public class FakeProductService : IProductService
     {
         throw new NotImplementedException();
     }
+
+    public Task<ProductDto> GetProductByBarcodeAsync(string barcode)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task IProductService.IncreaseQuantityAsync(int productId, int quantityToAdd)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    public Task<bool> DecreaseQuantitiesAsync(Dictionary<int, int> productQuantities)
+     {
+        throw new NotImplementedException();
+    }
+
+    Task<bool> IProductService.DeleteProductAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
 }

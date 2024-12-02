@@ -40,12 +40,13 @@ namespace Rise.Client.Products.Components
                 }
 
                 var success = await ProductService.CreateProductAsync(createProductDto);
-                NavigationManager.NavigateTo("/");
+
 
                 if (success)
                 {
                     // Navigeren naar de productlijst
-                    
+                    NavigationManager.NavigateTo("/");
+
                 }
                 else
                 {

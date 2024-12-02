@@ -3,6 +3,7 @@ using Rise.Client.Products.Services;
 using Rise.Shared.Products;
 using Rise.Client.Orders;
 using Blazored.Modal.Services;
+using Rise.Shared.Orders;
 
 namespace Rise.Client.Products;
 
@@ -13,6 +14,9 @@ public partial class ProductDetail : IDisposable
     [Inject] public required NavigationManager NavigationManager { get; set; }
     [Inject] public required ProductenlijstStatus ProductenlijstState { get; set; }
     [Inject] public required Winkelmand Winkelmand { get; set; }
+    [Inject] public required IOrderService orderService { get; set; }
+    [Inject] public required IProductService productService { get; set; }
+    private CreateOrderDto Order { get; set; } = new CreateOrderDto();
 
     private ProductDto? product;
     protected override async Task OnInitializedAsync()
@@ -36,5 +40,38 @@ public partial class ProductDetail : IDisposable
     {
         ProductenlijstState.VanDetailPagina = true;
         NavigationManager.NavigateTo("/");
+    }
+
+    private async void PlaatsBestelling()
+    {
+        try
+        {
+            Order.UserId = 1;
+            Order.OrderItems = Winkelmand.Items.Select(item => new CreateOrderItemDto
+            {
+                ProductId = item.ProductId,
+                Amount = item.Amount
+            }).ToList();
+
+            var response = await orderService.CreateOrderAsync(Order);
+
+            if (response)
+            {
+                var productQuantities = Winkelmand.Items.ToDictionary(item => item.ProductId, item => item.Amount);
+
+                var decreaseResponse = await productService.DecreaseQuantitiesAsync(productQuantities);
+
+                if (decreaseResponse)
+                {
+                    Winkelmand.Clear();
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Er is een fout opgetreden: {ex.Message}");
+        }
+
     }
 }

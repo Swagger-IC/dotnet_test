@@ -2,6 +2,7 @@
 using Rise.Domain.Users;
 using Rise.Domain.Leveranciers;
 using Rise.Domain.Products;
+using Rise.Domain.Orders;
 
 namespace Rise.Persistence;
 
@@ -24,6 +25,8 @@ public class Seeder
         SeedLeveranciers();
         SeedProducts();
         SeedUsers();
+        SeedOrders();
+
     }
 
     private bool HasAlreadyBeenSeeded()
@@ -50,19 +53,12 @@ public class Seeder
     {
         dbContext.Users.RemoveRange(dbContext.Users);
 
-        var availableRoles = Enum.GetValues(typeof(Rol)).Cast<Rol>().ToList();
-
-
-        var users = Enumerable.Range(1, 10)
-                              .Select(i => new User
-                              {
-                                  Voornaam = $"Voornaam {i}",
-                                  Naam = $"Naam {i}",
-                                  Email = $"user{i}@example.com",
-                                  TelNr = $"12345",
-                                  Rol = availableRoles[i % availableRoles.Count]
-                              })
-                              .ToList();
+        var users = new List<User>
+            {
+                new User { Voornaam = "Michiel", Email = "michiel_murphy@outlook.com", Naam = "Murphy" },
+                new User { Voornaam = "Corneel", Email = "corneel.verstraeten@student.hogent.be", Naam = "Verstraeten" },
+                new User { Voornaam = "Denzell", Email = "denzell@gmail.com", Naam = "Boelens" }
+            };
         dbContext.Users.AddRange(users);
         dbContext.SaveChanges();
     }
@@ -75,15 +71,6 @@ public class Seeder
             return;
 
         var leveranciers = dbContext.Leveranciers.ToList();
-
-
-
-
-
-
-
-
-
 
 
         var products = new List<Product>
@@ -382,4 +369,49 @@ public class Seeder
         dbContext.Products.AddRange(products);
         dbContext.SaveChanges();
     }
+    private void SeedOrders()
+    {
+        dbContext.Orders.RemoveRange(dbContext.Orders);
+
+        // Fetch existing users and products
+        var users = dbContext.Users.ToList();
+        var products = dbContext.Products.ToList();
+
+        if (!users.Any() || !products.Any())
+        {
+            throw new InvalidOperationException("Cannot seed orders: users or products are missing.");
+        }
+
+        // Create orders
+        var random = new Random();
+        var orders = new List<Order>();
+
+        for (int i = 0; i < 10; i++)
+        {
+            var user = users[random.Next(users.Count)];
+
+            var orderItems = new List<OrderItem>();
+            for (int j = 0; j < random.Next(1, 5); j++) // Each order has 1 to 4 items
+            {
+                var product = products[random.Next(products.Count)];
+                var amount = random.Next(1, 10); // Random amount between 1 and 10
+
+                orderItems.Add(new OrderItem
+                {
+                    Product = product,
+                    Amount = amount
+                });
+            }
+
+            orders.Add(new Order
+            {
+                User = user,
+                OrderItems = orderItems
+            });
+        }
+
+        dbContext.Orders.AddRange(orders);
+        dbContext.SaveChanges();
+    }
+
 }

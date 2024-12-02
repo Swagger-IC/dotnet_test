@@ -69,11 +69,19 @@ public class Winkelmand
                 }
                 OnCartChanged?.Invoke();
         }
+
         public void RemoveItem(WinkelmandItem item)
         {
                 items.Remove(item);
                 OnCartChanged?.Invoke();
         }
+
+        public void Clear()
+        {
+            items.Clear(); 
+            OnCartChanged?.Invoke(); 
+        }
+
         private void UpdateLocalStorage()
         {
                 this.localStorage.SetItem("Winkelmand", items);

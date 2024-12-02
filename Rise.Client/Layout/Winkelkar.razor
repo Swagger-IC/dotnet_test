@@ -1,0 +1,16 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <div class="cart-container">
+            <button class="nav-link btn btn-link" @onclick="WinkelOverzicht">
+                <i class="fas fa-shopping-cart"></i>
+                @if (Winkelmand.Items.Count > 0)
+                {
+                    <span class="badge-pill badge-primary">@Winkelmand.Items.Count</span>
+                }
+               
+            </button>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+

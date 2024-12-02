@@ -32,4 +32,14 @@ namespace Rise.Client.Users;
         var user = _users.FirstOrDefault(u => u.Email == email) ?? throw new InvalidOperationException($"User with email {email} not found");
         return Task.FromResult(user);
     }
+
+    Task<UserDto> IUserService.CreateUserAsync(CreateUserDto createUserDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task<UserDto?> IUserService.GetUserByEmailAsync(string email)
+    {
+        throw new NotImplementedException();
+    }
 }

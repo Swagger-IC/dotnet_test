@@ -8,6 +8,8 @@ using Rise.Domain.Leveranciers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.TestHost;
 using System.Linq;
+using Rise.Domain.Orders;
+using Rise.Domain.Users;
 
 public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
@@ -120,6 +122,34 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
 
         dbContext.Leveranciers.Add(leverancier);
         dbContext.Products.AddRange(product1, product2, product3, product4);
+        // Voeg een test-gebruiker toe
+        var user = new User
+        {
+            Voornaam = "Pol",
+            Naam = "test",
+            Email = "test@example.com",
+        };
+
+        dbContext.Users.Add(user);
+
+        // Maak orders en gebruik AddOrderItem
+        var order1 = new Order
+        {
+            User = user
+        };
+        order1.AddOrderItem(product1, 2);
+        order1.AddOrderItem(product3, 1);
+
+        var order2 = new Order
+        {
+            User = user
+        };
+        order2.AddOrderItem(product2, 5);
+        order2.AddOrderItem(product4, 3);
+
+        dbContext.Orders.AddRange(order1, order2);
+
+        // Sla wijzigingen op in de in-memory database
         dbContext.SaveChanges();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rise.Domain.Leveranciers;
+using Rise.Domain.Orders;
 using Rise.Domain.Products;
 using Rise.Domain.Users;
 
@@ -13,6 +14,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users => Set<User>();
 
     public DbSet<Leverancier> Leveranciers { get; set; }
+
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<OrderItem> OrderItems { get; set; }
 
 
     public ApplicationDbContext(DbContextOptions options) : base(options)

@@ -49,6 +49,17 @@ public class ProductService : IProductService
         return (response!.Products, response.TotalCount);
     }
 
+
+    public async Task IncreaseQuantityAsync(int productId, int quantityToAdd) {
+        var response = await httpClient.PutAsJsonAsync($"product/{productId}/increase", quantityToAdd);
+    
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(message);
+        }
+    } 
+
     public async Task<bool> CreateProductAsync(CreateProductDto createDto)
     {
         var response = await httpClient.PostAsJsonAsync("product", createDto);
@@ -68,6 +79,75 @@ public class ProductService : IProductService
         // Hier gebruik je je HttpClient om de afbeelding te uploaden
         return await httpClient.PostAsync("product/upload", content);
     }
+
+    public async Task<ProductDto> GetProductByBarcodeAsync(string barcode)
+    {
+        if (string.IsNullOrWhiteSpace(barcode))
+        {
+            throw new ArgumentException("Barcode mag niet leeg zijn.", nameof(barcode));
+        }
+
+        try
+        {
+            var product = await httpClient.GetFromJsonAsync<ProductDto>($"product/barcode/{Uri.EscapeDataString(barcode)}");
+            if (product == null)
+            {
+                throw new KeyNotFoundException($"Geen product gevonden met barcode: {barcode}");
+            }
+            return product;
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception($"Fout bij het ophalen van het product: {ex.Message}", ex);
+        }
+    }
+    public async Task<bool> DecreaseQuantitiesAsync(Dictionary<int, int> productQuantities)
+    {
+        if (productQuantities == null || productQuantities.Count == 0)
+        {
+            throw new ArgumentException("De lijst met producten mag niet leeg zijn.", nameof(productQuantities));
+        }
+
+        try
+        {
+            // Verzenden van de dictionary als JSON naar de API
+            var response = await httpClient.PostAsJsonAsync("product/decreaseQuantities", productQuantities);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Als het verzoek succesvol is, retourneer true
+                return true;
+            }
+            else
+            {
+                // Fout afhandelen op basis van de statuscode en inhoud van de foutmelding
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Fout bij het verlagen van producthoeveelheden: {errorMessage}");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception($"Netwerkfout bij het verlagen van producthoeveelheden: {ex.Message}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Algemene fout bij het verlagen van producthoeveelheden: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<bool> DeleteProductAsync(int id)
+    {
+        var response = await httpClient.DeleteAsync($"product/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return true;
+        }
+
+        return false;
+
+    }
+
 }
 
 

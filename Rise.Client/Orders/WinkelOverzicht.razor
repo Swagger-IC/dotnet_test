@@ -1,0 +1,44 @@
+﻿@page "/winkelmand"
+@using Rise.Client.Orders.Components
+
+<PageTitle>Winkelmand</PageTitle>
+
+<div class="container my-3">
+    @if (bestellingSuccesvol)
+    {
+        <div class="alert alert-success" role="alert">
+            Bestelling succesvol geplaatst!
+        </div>
+    }
+    else if (Winkelmand.Items.Count == 0)
+    {
+        <div class="alert alert-info" role="alert">
+            Je winkelmand is leeg. Voeg producten toe om een bestelling te plaatsen.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Jouw winkelwagentje</h3>
+                        <ul class="list-group">
+                            @foreach (var item in Winkelmand.Items)
+                            {
+                                <Overzichtlijn Lijn=@item />
+                            }
+                        </ul>
+                        <button class="btn btn-primary mt-3" @onclick="PlaatsBestelling">
+                            Bestelling plaatsen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    }
+</div>
+
+
+
