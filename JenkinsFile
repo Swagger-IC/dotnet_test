@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    stages {
+        stage('Synchronize GitHub Files') {
+            steps {
+                sh './Sync_files_github.sh'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh './Docker_build.sh'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                parallel(
+                    'Client Tests': {
+                        echo "Running Client Tests"
+                        
+                    },
+                    'Domain Tests': {
+                        echo "Running Domain Tests"
+                        
+                    },
+                    'Playwright Tests': {
+                        echo "Running Playwright Tests"
+                        
+                    },
+                    'Server Tests': {
+                        echo "Running Server Tests"
+                        
+                    }
+                )
+            }
+        }
+        stage('Move Docker Image to Remote Server') {
+            steps {
+                sh './Save_container_and_scp.sh'
+            }
+        }
+        stage('Unpack and Start/Update Swarm') {
+            agent { label 'remote-swarm-agent' } // Use the label of your remote agent
+            steps {
+                sh './Unpack_and_swarm.sh'
+            }
+        }
+    }
+    post {
+        always {
+            echo "Cleaning up unused Docker resources..."
+            sh 'docker system prune -f || true'
+        }
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Please check the logs."
+        }
+    }
+}
