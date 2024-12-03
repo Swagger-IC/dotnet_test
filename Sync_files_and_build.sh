@@ -20,6 +20,8 @@ rsync -av --delete \
   --exclude 'Jenkinsfile' \
   ./ tempdir/
 
+sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
+
 # Build the Docker image, from the dockerfile in the tempdir
 GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 docker build -t dotnet:$GIT_COMMIT_HASH tempdir
