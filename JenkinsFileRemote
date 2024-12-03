@@ -31,7 +31,7 @@ pipeline {
             steps {
                 parallel(
                     'Client Tests': {
-                        echo "Running Client Tests"q
+                        echo "Running Client Tests"
 
                     },
                     'Domain Tests': {
