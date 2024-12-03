@@ -40,12 +40,12 @@ RUN dotnet restore "Rise.Client/Rise.Client.csproj" \
 COPY . .
 
 # Change repository
-WORKDIR "/app/Rise.Server"
+WORKDIR /app/Rise.Server
 
 # Build the application
 RUN dotnet build "Rise.Server.csproj" -c Release -o /app/build
 
-WORKDIR "/app"
+WORKDIR /app
 
 # Install dotnet tools in build image
 RUN dotnet tool install --global dotnet-ef
@@ -57,7 +57,7 @@ ENV PATH="\${PATH}:/root/.dotnet/tools"
 RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persistence
 
 # Publish the application as user app
-WORKDIR "/app/Rise.Server"
+WORKDIR /app/Rise.Server
 RUN dotnet publish "Rise.Server.csproj" -c Release -o /app/publish
 
 FROM base AS final
