@@ -21,53 +21,47 @@ pipeline {
                 sh './Docker_build.sh'
             }
         }
-        stage('Run Tests and Transfer Image') {
-            parallel {
-                stage('Run Tests') {
-                    agent {
-                        node {
-                            label 'builtin'
-                        }
-                    }
-                    steps {
-                        parallel(
-                            'Client Tests': {
-                                echo "Running Client Tests"
 
-                            },
-                            'Domain Tests': {
-                                echo "Running Domain Tests"
-
-                            },
-                            'Playwright Tests': {
-                                echo "Running Playwright Tests"
-
-                            },
-                            'Server Tests': {
-                                echo "Running Server Tests"
-
-                            }
-                        )
-                    }
+        stage('Run Tests') {
+            agent {
+                node {
+                    label 'builtin'
                 }
-                stage('Transfer Image to Remote Server') {
-                    agent {
-                        node {
-                            label 'builtin'
-                        }
+            }
+            steps {
+                parallel(
+                    'Client Tests': {
+                        echo "Running Client Tests"q
+
+                    },
+                    'Domain Tests': {
+                        echo "Running Domain Tests"
+
+                    },
+                    'Playwright Tests': {
+                        echo "Running Playwright Tests"
+
+                    },
+                    'Server Tests': {
+                        echo "Running Server Tests"
+
                     }
-                    steps {
-                        sh './Save_container_and_scp.sh'
-                    }
-                }
+                )
             }
         }
-        stage('Unpack and Start/Update Swarm') {
-            when {
-                expression {
-                    currentBuild.result == null // Proceed only if tests passed
+
+        stage('Transfer Image to Remote Server') {
+            agent {
+                node {
+                    label 'builtin'
                 }
             }
+            steps {
+                sh './Save_container_and_scp.sh'
+            }
+        }
+
+        stage('Unpack and Start/Update Swarm') {
             agent {
                 node {
                     label 'dotnetserver'
@@ -78,21 +72,18 @@ pipeline {
             }
         }
     }
+    
     post {
-        failure {
-            echo "Tests failed. Cleaning up tar file on remote agent..."
-            agent { label 'builtin' }
-            steps {
-                sh './Remove_tar.sh'
-            }
-        }
         always {
             echo "Cleaning up unused Docker resources locally..."
-            agent { label 'builtin' }
+            agent {
+                node {
+                    label 'builtin'
+                }
+            }
             sh 'docker system prune -f || true'
         }
         success {
-            agent { label 'builtin' }
             echo "Pipeline completed successfully!"
         }
     }
