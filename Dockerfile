@@ -35,17 +35,16 @@ RUN dotnet restore "Rise.Server.Tests/Rise.Server.Tests.csproj"
 RUN dotnet restore "Rise.Services/Rise.Services.csproj"
 RUN dotnet restore "Rise.Shared/Rise.Shared.csproj"
 
-
 # Copy remaining files
 COPY . .
 
 # Change repository
-WORKDIR /app/Rise.Server
+WORKDIR "/app/Rise.Server"
 
 # Build the application
 RUN dotnet build "Rise.Server.csproj" -c Release -o /app/build
 
-WORKDIR /app
+WORKDIR "/app"
 
 # Install dotnet tools in build image
 RUN dotnet tool install --global dotnet-ef
