@@ -8,6 +8,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'chmod +x ./Sync_files_github.sh'
                 sh './Sync_files_github.sh'
             }
         }
@@ -18,6 +19,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'chmod +x ./Docker_build.sh'
                 sh './Docker_build.sh'
             }
         }
@@ -57,6 +59,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'chmod +x ./Save_container_and_scp.sh'
                 sh './Save_container_and_scp.sh'
             }
         }
@@ -68,6 +71,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'chmod +x ./Unpack_and_swarm.sh'
                 sh './Unpack_and_swarm.sh'
             }
         }
