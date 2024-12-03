@@ -11,50 +11,63 @@ pipeline {
                 sh './Docker_build.sh'
             }
         }
-        stage('Run Tests') {
-            steps {
-                parallel(
-                    'Client Tests': {
-                        echo "Running Client Tests"
-                        
-                    },
-                    'Domain Tests': {
-                        echo "Running Domain Tests"
-                        
-                    },
-                    'Playwright Tests': {
-                        echo "Running Playwright Tests"
-                        
-                    },
-                    'Server Tests': {
-                        echo "Running Server Tests"
-                        
+        stage('Run Tests and Transfer Image') {
+            parallel {
+                stage('Run Tests') {
+                    steps {
+                        parallel(
+                            'Client Tests': {
+                                echo "Running Client Tests"
+
+                            },
+                            'Domain Tests': {
+                                echo "Running Domain Tests"
+
+                            },
+                            'Playwright Tests': {
+                                echo "Running Playwright Tests"
+
+                            },
+                            'Server Tests': {
+                                echo "Running Server Tests"
+
+                            }
+                        )
                     }
-                )
-            }
-        }
-        stage('Move Docker Image to Remote Server') {
-            steps {
-                sh './Save_container_and_scp.sh'
+                }
+                stage('Transfer Image to Remote Server') {
+                    steps {
+                        sh './Save_container_and_scp.sh'
+                    }
+                }
             }
         }
         stage('Unpack and Start/Update Swarm') {
-            agent { label 'remote-swarm-agent' } // Use the label of your remote agent
+            when {
+                expression {
+                    currentBuild.result == null // Proceed only if tests passed
+                }
+            }
+            agent { label 'remote-swarm-agent' } // Use the remote agent for this stage
             steps {
                 sh './Unpack_and_swarm.sh'
             }
         }
     }
     post {
+        failure {
+            echo "Tests failed. Cleaning up tar file on remote agent..."
+            agent { label 'remote-swarm-agent' } // Use the remote agent for cleanup
+            steps {
+                sh './Remove_tar.sh'
+            }
+        }
         always {
-            echo "Cleaning up unused Docker resources..."
+            echo "Cleaning up unused Docker resources locally..."
             sh 'docker system prune -f || true'
         }
         success {
             echo "Pipeline completed successfully!"
-        }
-        failure {
-            echo "Pipeline failed. Please check the logs."
         }
     }
 }

@@ -16,7 +16,7 @@ if ! docker info | grep -q 'Swarm: active'; then
 fi
 
 #unpack the tarball
-docker load < dotnet.tar
+docker load < /root/dotnet.tar
 
 # Deploy or update the service
 if docker service ls --format '{{.Name}}' | grep -q "^$SERVICE_NAME\$"; then
@@ -32,6 +32,9 @@ sleep 15
 
 # Clean up unused Docker resources
 docker system prune -f
+
+# Remove the tarball
+rm /root/dotnet.tar
 
 # List the running Docker services
 docker service ls
