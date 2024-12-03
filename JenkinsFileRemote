@@ -81,30 +81,18 @@ pipeline {
     post {
         failure {
             echo "Tests failed. Cleaning up tar file on remote agent..."
-            agent {
-                node {
-                    label 'dotnetserver'
-                }
-            }
+            agent { label 'builtin' }
             steps {
                 sh './Remove_tar.sh'
             }
         }
         always {
             echo "Cleaning up unused Docker resources locally..."
-            agent {
-                node {
-                    label 'builtin'
-                }
-            }
+            agent { label 'builtin' }
             sh 'docker system prune -f || true'
         }
         success {
-            agent {
-                node {
-                    label 'builtin'
-                }
-            }
+            agent { label 'builtin' }
             echo "Pipeline completed successfully!"
         }
     }
