@@ -46,11 +46,10 @@ RUN dotnet build "Rise.Server.csproj" -c Release -o /app/build
 
 WORKDIR "/app"
 
-# Install dotnet tools in build image
+# dotnet-ef install
 RUN dotnet tool install --global dotnet-ef
-
-# Add tools path to environment
-ENV PATH="\${PATH}:/root/.dotnet/tools"
+ENV PATH="${PATH}:/root/.dotnet/tools"
+RUN dotnet-ef --version
 
 # Apply database migrations
 RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persistence
