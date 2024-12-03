@@ -17,7 +17,6 @@ rsync -av --delete \
   --exclude '.gitignore' \
   --exclude '.git/' \
   --exclude '*.sh' \
-  --exclude 'old_scripts/'
   --exclude 'Jenkinsfile' \
   ./ tempdir/
 
