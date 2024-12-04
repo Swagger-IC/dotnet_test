@@ -7,7 +7,7 @@ SSH_connection="vagrant@$remote_server"
 docker save dotnet:$GIT_COMMIT_HASH > dotnet.tar
 
 #Transfer the tarball to the remote server
-scp -i /var/jenkins_home/.ssh/id_rsa dotnet.tar $SSH_connection:/home/vagrant/
+scp dotnet.tar $SSH_connection:/home/
 
 # Remove the tarball
 rm dotnet.tar
