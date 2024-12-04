@@ -1,6 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
+# Check if dotnetapp container is running
+if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
+  echo "Container dotnetapp is running"
+  docker stop dotnetapp
+  docker rm dotnetapp
+fi
+
 # Clean up unused Docker resources
 docker system prune -f
 
