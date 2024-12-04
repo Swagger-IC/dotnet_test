@@ -40,7 +40,7 @@ sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Dat
 
 # Build the Docker image, from the dockerfile in the tempdir
 GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
-docker build -t dotnet:$GIT_COMMIT_HASH tempdir
+docker build --no-cache -t dotnet:$GIT_COMMIT_HASH tempdir
 
 # Stop and remove any running container with the same name
 if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
