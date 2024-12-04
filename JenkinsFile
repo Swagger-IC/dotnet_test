@@ -1,17 +1,17 @@
 pipeline {
     agent none
     stages {
-        stage('Synchronize Files and build') {
+        stage('Synchronize GitHub Files and build container') {
             agent {
                 node {
                     label 'builtin'
                 }
             }
             steps {
+                sh 'chmod +x ./Sync_files_and_build.sh'
                 sh './Sync_files_and_build.sh'
             }
         }
-
         stage('Run Tests') {
             agent {
                 node {
@@ -47,6 +47,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'chmod +x ./Save_container_and_scp.sh'
                 sh './Save_container_and_scp.sh'
             }
         }
@@ -58,6 +59,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'chmod +x ./Unpack_and_swarm.sh'
                 sh './Unpack_and_swarm.sh'
             }
         }
@@ -66,10 +68,11 @@ pipeline {
     post {
         always {
             echo "Cleaning up unused Docker resources locally..."
-            agent { label 'builtin' }
+            agent { node { label 'builtin' } }
             sh 'docker system prune -f || true'
         }
         success {
+            agent { node { label 'builtin' } }
             echo "Pipeline completed successfully!"
         }
     }
