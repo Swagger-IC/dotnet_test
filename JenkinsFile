@@ -1,24 +1,14 @@
 pipeline {
     agent none
     stages {
-        stage('Synchronize GitHub Files') {
+        stage('Synchronize Files and build') {
             agent {
                 node {
                     label 'builtin'
                 }
             }
             steps {
-                sh './Sync_files_github.sh'
-            }
-        }
-        stage('Build Docker Image') {
-            agent {
-                node {
-                    label 'builtin'
-                }
-            }
-            steps {
-                sh './Docker_build.sh'
+                sh './Sync_files_and_build.sh'
             }
         }
 
