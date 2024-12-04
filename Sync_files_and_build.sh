@@ -48,7 +48,7 @@ if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnet
 fi
 
 # Run the new container
-docker run -t -d -p 6000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
+docker run -t -d -p 8000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
 
 # List the running Docker containers
 docker ps -a | grep dotnetapp
