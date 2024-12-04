@@ -4,6 +4,9 @@ set -euo pipefail
 # Clean up unused Docker resources
 docker system prune -f
 
+# remove previous dotnet image
+docker rmi -f $(docker images -q dotnet) || true
+
 # Define workspace and temp directory paths
 WORKSPACE_DIR="$(pwd)"
 TEMP_DIR="$WORKSPACE_DIR/tempdir"
