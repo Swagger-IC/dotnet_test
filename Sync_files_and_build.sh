@@ -23,7 +23,7 @@ rsync -av --delete \
   --exclude '*.sh' \
   --exclude 'Jenkinsfile' \
   --exclude 'tempdir/' \
-  "$WORKSPACE_DIR/" "$TEMP_DIR/"
+  ./ "$TEMP_DIR/"
 
 # Change connection string for sql server
 sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
