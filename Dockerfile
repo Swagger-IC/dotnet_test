@@ -65,7 +65,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Add tools path to environment
-ENV PATH="\${PATH}:/root/.dotnet/tools"
+ENV PATH="${PATH}:/root/.dotnet/tools"
 ENV ASPNETCORE_URLS=http://+:5000
 
 # Start the application
