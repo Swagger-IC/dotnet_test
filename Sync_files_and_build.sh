@@ -4,12 +4,16 @@ set -euo pipefail
 # Clean up unused Docker resources
 docker system prune -f
 
-# Create the temporary directory if it doesn't exist
-if [ ! -d tempdir ]; then
-  mkdir -p tempdir
+# Define workspace and temp directory paths
+WORKSPACE_DIR="$(pwd)"
+TEMP_DIR="$WORKSPACE_DIR/tempdir"
+
+# Ensure the tempdir exists
+if [ ! -d "$TEMP_DIR" ]; then
+  mkdir -p "$TEMP_DIR"
 fi
 
-# Sync files, excluding unnecessary ones
+# Sync files from the workspace to tempdir, excluding unnecessary files and directories
 rsync -av --delete \
   --exclude 'bin/' \
   --exclude 'obj/' \
@@ -18,8 +22,10 @@ rsync -av --delete \
   --exclude '.git/' \
   --exclude '*.sh' \
   --exclude 'Jenkinsfile' \
-  ./ tempdir/
+  --exclude 'tempdir/' \
+  "$WORKSPACE_DIR/" "$TEMP_DIR/"
 
+# Change connection string for sql server
 sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
 
 # Build the Docker image, from the dockerfile in the tempdir
