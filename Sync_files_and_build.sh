@@ -9,7 +9,7 @@ if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnet
 fi
 
 # Clean up unused Docker resources
-docker system prune -f
+docker system prune -a -f
 
 # remove previous dotnet image
 docker rmi -f $(docker images -q dotnet) || true
