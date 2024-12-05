@@ -18,7 +18,7 @@ ssh-copy-id $SSH_connection
 ssh-keyscan -H $remote_server >> ~/.ssh/known_hosts
 
 # Transfer the tarball to the remote server
-scp dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/
+scp -v dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/
 if [ $? -eq 0 ]; then
     echo "File transfer to $remote_server was successful."
 else
