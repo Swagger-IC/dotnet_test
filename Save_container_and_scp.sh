@@ -14,6 +14,13 @@ fi
 docker save dotnet:$GIT_COMMIT_HASH > dotnet_$GIT_COMMIT_HASH.tar
 echo "Docker image 'dotnet:$GIT_COMMIT_HASH' saved to dotnet_$GIT_COMMIT_HASH.tar."
 
+# Check if root has ssh keys
+if [ ! -f /root/.ssh/id_rsa ]; then
+    echo "Root does not have ssh keys. Creating them..."
+    ssh-keygen -t rsa -b 2048 -N ""
+    ssh-copy-id $SSH_connection
+fi
+
 # Transfer the tarball to the remote server
 scp -v dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/vagrant/
 if [ $? -eq 0 ]; then
