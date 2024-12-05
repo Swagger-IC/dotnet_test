@@ -22,7 +22,7 @@ if [ ! -f /root/.ssh/id_rsa ]; then
 fi
 
 # Transfer the tarball to the remote server
-scp -v dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/vagrant/
+scp -v dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/
 if [ $? -eq 0 ]; then
     echo "File transfer to $remote_server was successful."
 else
