@@ -14,6 +14,7 @@ docker save dotnet:$GIT_COMMIT_HASH > dotnet_$GIT_COMMIT_HASH.tar
 echo "Docker image 'dotnet:$GIT_COMMIT_HASH' saved to dotnet_$GIT_COMMIT_HASH.tar."
 
 # Ensure the remote server is in known_hosts to avoid SSH verification issues
+sshssh-copy-id $SSH_connection
 ssh-keyscan -H $remote_server >> ~/.ssh/known_hosts
 
 # Transfer the tarball to the remote server
