@@ -17,7 +17,7 @@ echo "Docker image 'dotnet:$GIT_COMMIT_HASH' saved to dotnet_$GIT_COMMIT_HASH.ta
 ssh-keyscan -H $remote_server >> ~/.ssh/known_hosts
 
 # Transfer the tarball to the remote server
-scp dotnet.tar $SSH_connection:/home/
+scp dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/
 if [ $? -eq 0 ]; then
     echo "File transfer to $remote_server was successful."
 else
@@ -26,5 +26,6 @@ else
 fi
 
 # Remove the local tarball after successful transfer
-rm dotnet.tar
-echo "Local tarball removed."
+rm dotnet_$GIT_COMMIT_HASH.tar
+echo "Local tarball 'dotnet_$GIT_COMMIT_HASH.tar' removed."
+
