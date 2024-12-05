@@ -18,6 +18,7 @@ if [ ! -f ~/.ssh/id_rsa ]; then
     ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -q -N ""
 fi
 ssh-copy-id $SSH_connection
+ssh-keygen -R $remote_server
 ssh-keyscan -H $remote_server >> ~/.ssh/known_hosts
 
 # Transfer the tarball to the remote server
