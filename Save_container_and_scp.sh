@@ -1,16 +1,17 @@
 #!/bin/bash
 remote_server="192.168.56.13"
 SSH_connection="vagrant@$remote_server"
+GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 
-# Validate if the Docker image 'dotnet' exists
-if ! sudo docker image inspect dotnet > /dev/null 2>&1; then
-    echo "Docker image 'dotnet' does not exist."
+# Validate if the image exists
+if ! docker image inspect dotnet:$GIT_COMMIT_HASH > /dev/null 2>&1; then
+    echo "Docker image 'dotnet:$GIT_COMMIT_HASH' does not exist after build."
     exit 1
 fi
 
-# Save the Docker image 'dotnet' to a tarball
-sudo docker save dotnet > dotnet.tar
-echo "Docker image 'dotnet' saved to dotnet.tar."
+# Save the Docker image to a tarball
+docker save dotnet:$GIT_COMMIT_HASH > dotnet_$GIT_COMMIT_HASH.tar
+echo "Docker image 'dotnet:$GIT_COMMIT_HASH' saved to dotnet_$GIT_COMMIT_HASH.tar."
 
 # Ensure the remote server is in known_hosts to avoid SSH verification issues
 ssh-keyscan -H $remote_server >> ~/.ssh/known_hosts
