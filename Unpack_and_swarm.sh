@@ -16,7 +16,7 @@ if ! docker info | grep -q 'Swarm: active'; then
 fi
 
 #unpack the tarball
-docker load < /root/dotnet.tar
+docker load < dotnet_$GIT_COMMIT_HASH.tar
 
 # Deploy or update the service
 if docker service ls --format '{{.Name}}' | grep -q "^$SERVICE_NAME\$"; then
