@@ -14,7 +14,9 @@ docker save dotnet:$GIT_COMMIT_HASH > dotnet_$GIT_COMMIT_HASH.tar
 echo "Docker image 'dotnet:$GIT_COMMIT_HASH' saved to dotnet_$GIT_COMMIT_HASH.tar."
 
 # Ensure the remote server is in known_hosts to avoid SSH verification issues
-ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -q -N ""
+if [ ! -f ~/.ssh/id_rsa ]; then
+    ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -q -N ""
+fi
 ssh-copy-id $SSH_connection
 ssh-keyscan -H $remote_server >> ~/.ssh/known_hosts
 
