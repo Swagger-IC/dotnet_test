@@ -10,6 +10,7 @@ pipeline {
     stages {
         stage('Sync Files') {
             steps {
+                sh 'chmod +x old_scripts/Sync_files.sh'
                 sh'old_scripts/Sync_files.sh'
             }
         }
