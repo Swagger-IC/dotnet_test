@@ -14,11 +14,14 @@ SERVICE_NAME="dotnetapp"
 IMAGE_NAME="dotnet"
 GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 FULL_IMAGE_NAME="$IMAGE_NAME:$GIT_COMMIT_HASH"
+WORKSPACE_DIR="$(pwd)"
+TEMP_DIR="$WORKSPACE_DIR/tempdir"
 
-# Create the temporary directory if it doesn't exist
-if [ ! -d tempdir ]; then
-  mkdir -p tempdir
+# Ensure the tempdir exists
+if [ ! -d "$TEMP_DIR" ]; then
+  mkdir -p "$TEMP_DIR"
 fi
+
 
 # Sync files from the workspace to tempdir, excluding unnecessary files and directories
 rsync -av --delete \
