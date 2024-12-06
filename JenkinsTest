@@ -20,9 +20,7 @@ pipeline {
                 echo "Running server tests"
                 script {
                     // Use the TEMP_DIR environment variable for the dotnetTest step
-                    //dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                    sh 'ls -R $TEMP_DIR'
-
+                    dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
                 }
             }
         }
