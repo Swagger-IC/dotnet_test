@@ -16,39 +16,21 @@ pipeline {
         }
 
         stage('Run Tests and Transfer Image') {
-            parallel {
-                clienttests: {
-                    try {
-                        echo 'Running client Tests'
-                        dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                    } catch (Exception e) {
-                        echo 'Client Tests failed'
-                    }
-                }
-                domaintests: {
-                    try {
-                        echo 'Running Domain Tests'
-                        dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                    } catch (Exception e) {
-                        echo 'Domain Tests failed'
-                    }
-                }
-                playwrighttests: {
-                    try {
-                        echo 'Running Playwright Tests'
-                        dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                    } catch (Exception e) {
-                        echo 'Playwright Tests failed'
-                    }
-                }
-                servertests: {
-                    try {
-                        echo 'Running Server Tests'
-                        dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                    } catch (Exception e) {
-                        echo 'Server Tests failed'
-                    }
-                }
+            parallel clienttests: {
+                echo 'Running client Tests'
+                dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            },
+            domaintests: {
+                echo 'Running Domain Tests'
+                dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            },
+            playwrighttests: {
+                echo 'Running Playwright Tests'
+                dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            },
+            servertests: {
+                echo 'Running Server Tests'
+                dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
             }
         }
     }
