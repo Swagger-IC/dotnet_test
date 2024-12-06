@@ -16,19 +16,21 @@ pipeline {
         }
 
         stage('Run Tests and Transfer Image') {
-            parallel clienttests: {
+            parallel 
+            
+            stage ('Client Tests') {
                 echo 'Running client Tests'
                 dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-            },
-            domaintests: {
+            }
+            stage ('Domain Tests') {
                 echo 'Running Domain Tests'
                 dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-            },
-            playwrighttests: {
+            }
+            stage ('Playwright Tests') {
                 echo 'Running Playwright Tests'
                 dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-            },
-            servertests: {
+            }
+            stage ('Server Tests') {
                 echo 'Running Server Tests'
                 dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
             }
