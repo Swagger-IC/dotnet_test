@@ -14,12 +14,23 @@ fi
 docker save dotnet:$GIT_COMMIT_HASH > dotnet_$GIT_COMMIT_HASH.tar
 echo "Docker image 'dotnet:$GIT_COMMIT_HASH' saved to dotnet_$GIT_COMMIT_HASH.tar."
 
-# Check if root has ssh keys
+# Check if root has SSH keys
 if [ ! -f /root/.ssh/id_rsa ]; then
-    echo "Root does not have ssh keys. Creating them..."
-    ssh-keygen -t rsa -b 2048 -N ""
-    ssh-copy-id $SSH_connection
+    echo "Root does not have SSH keys. Creating them..."
+    # Generate the SSH key pair without a passphrase
+    ssh-keygen -t rsa -b 2048 -N "" -f /root/.ssh/id_rsa
+
+    # Ensure the .ssh directory on the remote server exists and has correct permissions
+    ssh $SSH_connection "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
+
+    # Append the public key to the remote server's authorized_keys
+    cat /root/.ssh/id_rsa.pub | ssh $SSH_connection "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+
+    echo "SSH key successfully created and transferred to the remote server."
+else
+    echo "Root already has SSH keys."
 fi
+
 
 # Transfer the tarball to the remote server
 scp -v dotnet_$GIT_COMMIT_HASH.tar $SSH_connection:/home/$user/
