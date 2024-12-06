@@ -5,6 +5,7 @@ WORKSPACE_DIR="$(pwd)"
 TEMP_DIR="$WORKSPACE_DIR/tempdir"
 GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 
+
 # Check if dotnetapp container is running
 if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
   echo "Container dotnetapp is running"
