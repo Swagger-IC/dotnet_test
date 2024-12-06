@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+WORKSPACE_DIR="$(pwd)"
+TEMP_DIR="$WORKSPACE_DIR/tempdir"
+
 # Ensure the tempdir exists
 if [ ! -d "$TEMP_DIR" ]; then
   mkdir -p "$TEMP_DIR"
