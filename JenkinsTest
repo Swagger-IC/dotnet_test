@@ -11,26 +11,28 @@ pipeline {
         stage('Sync Files') {
             steps {
                 sh 'chmod +x old_scripts/Sync_files.sh'
-                sh'old_scripts/Sync_files.sh'
+                sh 'old_scripts/Sync_files.sh'
             }
         }
 
         stage('Run Tests') {
-            parallel clienttests: {
-                echo 'Running client Tests'
-                dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-            },
-            domaintests: {
-                echo 'Running Domain Tests'
-                dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-            },
-            servertests: {
-                echo 'Running Server Tests'
-                dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-            },
-            playwrighttests: {
-                echo 'Running Playwright Tests'
-                dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            parallel {
+                clienttests: {
+                    echo 'Running client Tests'
+                    dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+                },
+                domaintests: {
+                    echo 'Running Domain Tests'
+                    dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+                },
+                servertests: {
+                    echo 'Running Server Tests'
+                    dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+                },
+                playwrighttests: {
+                    echo 'Running Playwright Tests'
+                    dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+                }
             }
         }
     }
