@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Sync Files') {
             steps {
-                sh'./Sync_files.sh'
+                sh'old_scripts/Sync_files.sh'
             }
         }
 
