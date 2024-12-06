@@ -54,6 +54,13 @@ RUN dotnet-ef --version
 # Apply database migrations
 RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persistence
 
+# Run tests during the build phase
+WORKDIR "/app"
+#RUN dotnet test "Rise.Client.Tests/"
+#RUN dotnet test "Rise.Domain.Tests/"
+#RUN dotnet test "Rise.PlaywrightTests/"
+#RUN dotnet test "Rise.Server.Tests/"
+
 # Publish the application as user app
 WORKDIR /app/Rise.Server
 RUN dotnet publish "Rise.Server.csproj" -c Release -o /app/publish
