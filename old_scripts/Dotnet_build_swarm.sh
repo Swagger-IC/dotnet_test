@@ -47,7 +47,7 @@ if docker service ls | grep -q $SERVICE_NAME; then
   docker service update --image $FULL_IMAGE_NAME $SERVICE_NAME
 else
   echo "Creating the service with git commit hash $GIT_COMMIT_HASH"
-  docker service create --name $SERVICE_NAME --replicas 1 --publish 5000:5000 $FULL_IMAGE_NAME
+  docker service create --name $SERVICE_NAME --replicas 2 --publish 5000:5000 $FULL_IMAGE_NAME
 fi
 
 # Wait for 15 seconds for the service to start
