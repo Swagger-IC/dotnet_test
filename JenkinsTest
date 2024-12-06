@@ -24,7 +24,7 @@ pipeline {
                     } catch (Exception e) {
                         echo 'Client Tests failed'
                     }
-                },
+                }
                 domaintests: {
                     try {
                         echo 'Running Domain Tests'
@@ -32,7 +32,7 @@ pipeline {
                     } catch (Exception e) {
                         echo 'Domain Tests failed'
                     }
-                },
+                }
                 playwrighttests: {
                     try {
                         echo 'Running Playwright Tests'
@@ -40,7 +40,7 @@ pipeline {
                     } catch (Exception e) {
                         echo 'Playwright Tests failed'
                     }
-                },
+                }
                 servertests: {
                     try {
                         echo 'Running Server Tests'
