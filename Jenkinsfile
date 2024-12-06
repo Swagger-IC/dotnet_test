@@ -8,7 +8,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'chmod +x ./Sync_files_and_build.sh'
+                sh 'chmod +x ./old_scripts/dotnet_tests.sh'
                 sh './old_scripts/dotnet_tests.sh'
             }
         }
@@ -19,7 +19,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'chmod +x ./Sync_files_and_build.sh'
+                sh 'chmod +x ./old_scripts/Dotnet_build_swarm.sh'
                 sh './old_scripts/Dotnet_build_swarm.sh'
             }
         }
