@@ -1,21 +1,43 @@
 #!/bin/bash
 set -euo pipefail
 
+WORKSPACE_DIR="$(pwd)"
+TEMP_DIR="$WORKSPACE_DIR/tempdir"
+GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
+
+# Check if dotnetapp container is running
+if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
+  echo "Container dotnetapp is running"
+  docker stop dotnetapp
+  docker rm dotnetapp
+fi
+
 # Clean up unused Docker resources
 docker system prune -f
 
-# Create the temporary directory
-mkdir -p tempdir
+# remove previous dotnet image
+docker rmi -f $(docker images -q dotnet) || true
 
-# Sync files, excluding unnecessary ones
+# Ensure the tempdir exists
+if [ ! -d "$TEMP_DIR" ]; then
+  mkdir -p "$TEMP_DIR"
+fi
+
+# Sync files from the workspace to tempdir, excluding unnecessary files and directories
 rsync -av --delete \
   --exclude 'bin/' \
   --exclude 'obj/' \
   --exclude 'README.md' \
   --exclude '.gitignore' \
   --exclude '.git/' \
-  --exclude 'dotnet_tests.sh' \
-  ./ tempdir/
+  --exclude '*.sh' \
+  --exclude 'Jenkinsfile' \
+  --exclude 'tempdir/' \
+  ./ "$TEMP_DIR/"
+
+# Change connection string for sql server
+sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseTestDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
+
 
 # Create the Dockerfile dynamically in tempdir
 cat > tempdir/Dockerfile << _EOF_
@@ -67,11 +89,10 @@ RUN dotnet build "Rise.Server.csproj" -c Release -o /app/build
 
 WORKDIR "/app"
 
-# Install dotnet tools in build image
+# dotnet-ef install
 RUN dotnet tool install --global dotnet-ef
-
-# Add tools path to environment
-ENV PATH="\${PATH}:/root/.dotnet/tools"
+ENV PATH="${PATH}:/root/.dotnet/tools"
+RUN dotnet-ef --version
 
 # Apply database migrations
 RUN dotnet-ef database update --startup-project Rise.Server --project Rise.Persistence
@@ -83,8 +104,8 @@ RUN dotnet test "Rise.Domain.Tests/"
 #RUN dotnet test "Rise.PlaywrightTests/"
 RUN dotnet test "Rise.Server.Tests/"
 
-# Publish the application
-WORKDIR "/app/Rise.Server"
+# Publish the application as user app
+WORKDIR /app/Rise.Server
 RUN dotnet publish "Rise.Server.csproj" -c Release -o /app/publish
 
 FROM base AS final
@@ -94,7 +115,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Add tools path to environment
-ENV PATH="\${PATH}:/root/.dotnet/tools"
+ENV PATH="${PATH}:/root/.dotnet/tools"
 ENV ASPNETCORE_URLS=http://+:5000
 
 # Start the application
@@ -102,16 +123,10 @@ ENTRYPOINT ["dotnet", "Rise.Server.dll"]
 _EOF_
 
 # Build the Docker image, tagging it with the current Git commit hash for versioning
-GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 docker build -t dotnet:$GIT_COMMIT_HASH tempdir
 
-# Stop and remove any running container with the same name
-if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
-  docker rm -f dotnetapp
-fi
-
 # Run the new container
-docker run -t -d -p 6000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
+docker run -t -d -p 8000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
 
 # List the running Docker containers
 docker ps -a | grep dotnetapp
