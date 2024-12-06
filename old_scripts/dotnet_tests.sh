@@ -7,7 +7,7 @@ GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 
 
 # Check if dotnetapp container is running
-if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnettesting; then
+if docker ps -a --filter "name=dotnettesting" --format '{{.Names}}' | grep -q dotnettesting; then
   echo "Container dotnettesting is running"
   docker stop dotnettesting
   docker rm dotnettesting
