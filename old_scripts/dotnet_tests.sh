@@ -7,10 +7,10 @@ GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 
 
 # Check if dotnetapp container is running
-if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnetapp; then
-  echo "Container dotnetapp is running"
-  docker stop dotnetapp
-  docker rm dotnetapp
+if docker ps -a --filter "name=dotnetapp" --format '{{.Names}}' | grep -q dotnettesting; then
+  echo "Container dotnettesting is running"
+  docker stop dotnettesting
+  docker rm dotnettesting
 fi
 
 # Clean up unused Docker resources
@@ -127,7 +127,7 @@ _EOF_
 docker build -t dotnet:$GIT_COMMIT_HASH tempdir
 
 # Run the new container
-docker run -t -d -p 8000:5000 --name dotnetapp dotnet:$GIT_COMMIT_HASH
+docker run -t -d -p 8000:5000 --name dotnettesting dotnet:$GIT_COMMIT_HASH
 
 # List the running Docker containers
-docker ps -a | grep dotnetapp
+docker ps -a | grep dotnettesting
