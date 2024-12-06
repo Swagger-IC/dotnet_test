@@ -28,7 +28,7 @@ sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Dat
 if ! command -v dotnet &> /dev/null; then
   echo "dotnet is not installed. Installing dotnet..."
     # Install dotnet
-    dnf install -y dotnet-sdk-8.0
+    apt-get install -y dotnet-sdk-8.0
 fi
 
 # Run tests
