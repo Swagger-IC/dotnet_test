@@ -14,6 +14,30 @@ pipeline {
                 sh 'old_scripts/Sync_files.sh'
             }
         }
+        stage('Restoring client.test packages') {
+            steps {
+                echo 'Restoring client.test packages'
+                sh 'dotnet restore ${env.TEMP_DIR}/Rise.Client.Tests/'
+            }
+        }
+        stage('Restoring domain.test packages') {
+            steps {
+                echo 'Restoring domain.test packages'
+                sh 'dotnet restore ${env.TEMP_DIR}/Rise.Domain.Tests/'
+            }
+        }
+        stage('Restoring playwright.test packages') {
+            steps {
+                echo 'Restoring playwright.test packages'
+                sh 'dotnet restore ${env.TEMP_DIR}/Rise.PlaywrightTests/'
+            }
+        }
+        stage('Restoring server.test packages') {
+            steps {
+                echo 'Restoring server.test packages'
+                sh 'dotnet restore ${env.TEMP_DIR}/Rise.Server.Tests/'
+            }
+        }
 
         stage('Run Tests and Transfer Image') {
             parallel {
