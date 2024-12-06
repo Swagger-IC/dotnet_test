@@ -18,5 +18,8 @@ rsync -av --delete \
   --exclude 'tempdir/' \
   ./ "$TEMP_DIR/"
 
+# Change connection string for sql server
+sed -i 's|^\s*"SqlServer": *".*"|    "SqlServer": "Server=192.168.56.11,1433;Database=Hogent.RiseTestDb;User Id=sa;Password=Password1234!;Encrypt=Optional;TrustServerCertificate=true"|' tempdir/Rise.Server/appsettings.json
+
 # run dotnet test
 dotnet test "Rise.Client.Tests/"
