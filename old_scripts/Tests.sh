@@ -19,6 +19,7 @@ rsync -av --delete \
   --exclude '*.sh' \
   --exclude 'Jenkinsfile' \
   --exclude 'tempdir/' \
+  --exclude 'old_scripts/' \
   ./ "$TEMP_DIR/"
 
 # Change connection string for sql server
