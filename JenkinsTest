@@ -71,17 +71,7 @@ pipeline {
     post {
         always {
             echo 'send discord notification'
-            discordSend(
-                webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T",
-                discordSend description: 'Status of my Project',
-                footer: '',
-                image: '',
-                link: env.BUILD_URL,
-                result: currentBuild.currentResult,
-                scmWebUrl: '',
-                thumbnail: '',
-                title: JOB_NAME
-            )
+            discordSend description: "Jenkins Pipeline Build", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
         }
     }
 }
