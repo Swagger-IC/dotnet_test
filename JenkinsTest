@@ -69,9 +69,16 @@ pipeline {
         }
     }
     post {
-        always {
-            echo 'send discord notification'
-            discordSend description: "Jenkins Pipeline Build", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
-        }
+    always {
+        echo 'send discord notification'
+        discordSend description: "Jenkins Pipeline Build", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
     }
+    failure {
+        echo 'Build failed. Sending logs to Discord...'
+        // Send logs to Discord
+        def log = currentBuild.rawBuild.getLog(100).join("\n") // Fetch the last 100 lines of the build log
+        discordSend description: "Error Logs", footer: "", link: env.BUILD_URL, result: "FAILURE", title: "Error Logs for ${env.JOB_NAME}", webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T", content: log
+    }
+}
+
 }
