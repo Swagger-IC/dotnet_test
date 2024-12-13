@@ -68,30 +68,10 @@ pipeline {
             }
         }
     }
-post {
-    always {
-        echo 'send discord notification'
-        discordSend(
-            description: "Jenkins Pipeline Build",
-            footer: "",
-            link: env.BUILD_URL,
-            result: currentBuild.currentResult,
-            title: env.JOB_NAME,
-            webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
-        )
+    post {
+        always {
+            echo 'send discord notification'
+            discordSend description: "Jenkins Pipeline Build", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
+        }
     }
-    failure {
-        echo 'Build failed. Sending logs to Discord...'
-        // Fetch the last 50 lines of the build log to avoid exceeding Discord's content limit.
-        def log = currentBuild.rawBuild.getLog(50).join("\n")
-        discordSend(
-            description: "Error Logs:\n```\n${log}\n```",
-            footer: "Logs from Jenkins Build",
-            link: env.BUILD_URL,
-            result: "FAILURE",
-            title: "Error Logs for ${env.JOB_NAME}",
-            webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
-        )
-    }
-}
 }
