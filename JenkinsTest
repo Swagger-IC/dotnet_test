@@ -39,7 +39,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests and Transfer Image') {
+        stage('Run Tests') {
             parallel {
                 stage ('Client Tests') {
                     steps {
