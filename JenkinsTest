@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         // Set these environment variables globally within the pipeline
-        WORKSPACE_DIR = "${pwd()}"
-        TEMP_DIR = "${WORKSPACE_DIR}/tempdir"
+            WORKSPACE_DIR = "${pwd()}"
+            TEMP_DIR = "${WORKSPACE_DIR}/tempdir"
     }
 
     stages {
@@ -39,32 +39,32 @@ pipeline {
             }
         }
 
-            stage ('Client Tests') {
-                steps {
-                    echo 'Running client Tests'
-                    build 'Client tests'
-                }
-            }
-            stage ('Domain Tests') {
-                steps {
-                    echo 'Running Domain Tests'
-                    //dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                }
-            }
-            stage ('Playwright Tests') {
-                steps {
-                    echo 'Running Playwright Tests'
-                    //dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                }
-            }
-            stage ('Server Tests') {
-                steps {
-                    echo 'Running Server Tests'
-                    //dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                }
+        stage ('Client Tests') {
+            steps {
+                echo 'Running client Tests'
+                //dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+                build 'Client test'
             }
         }
-    
+        stage ('Domain Tests') {
+            steps {
+                echo 'Running Domain Tests'
+                //dotnetTest project: "${env.TEMP_DIR}/Rise.Domain.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            }
+        }
+        stage ('Playwright Tests') {
+            steps {
+                echo 'Running Playwright Tests'
+                //dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            }
+        }
+        stage ('Server Tests') {
+            steps {
+                echo 'Running Server Tests'
+                //dotnetTest project: "${env.TEMP_DIR}/Rise.Server.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
+            }
+        }
+    }
     post {
         always {
             echo 'send discord notification'
