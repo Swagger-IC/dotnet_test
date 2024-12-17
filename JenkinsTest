@@ -43,7 +43,7 @@ pipeline {
             steps {
                 echo 'Running client Tests'
                 //dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                build 'Client test'
+                build 'Client tests'
             }
         }
         stage ('Domain Tests') {
