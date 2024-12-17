@@ -43,7 +43,7 @@ pipeline {
             steps {
                 echo 'Running client Tests'
                 //dotnetTest project: "${env.TEMP_DIR}/Rise.Client.Tests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                //build 'Client tests'
+                build 'Client tests'
             }
         }
         stage ('Domain Tests') {
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 echo 'Running Playwright Tests'
                 //dotnetTest project: "${env.TEMP_DIR}/Rise.PlaywrightTests/", sdk: 'dotnet_8.0', unstableIfWarnings: true
-                //build 'Playwright tests'
+                build 'Playwright tests'
             }
         }
         stage ('Server Tests') {
@@ -69,9 +69,17 @@ pipeline {
         }
     }
     post {
-        always {
+        success {
             echo 'send discord notification'
-            discordSend description: "Jenkins Pipeline Build", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
+            discordSend description: "Jenkins Pipeline Build successful", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
+        }
+        failure {
+            echo 'send discord notification'
+            discordSend description: "Jenkins Pipeline Build failed", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
+        }
+        unstable {
+            echo 'send discord notification'
+            discordSend description: "Jenkins Pipeline Build unstable", footer: "", link: env.BUILD_URL, result: currentBuild.currentResult, title: env.JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1317054110415192125/mTtKDLh2HlNweJp6ljUjDYDIiaAX2Ia3Vo6TfMGD1prBzLTTewwl1CveOQAYYmtoog-T"
         }
     }
 }
