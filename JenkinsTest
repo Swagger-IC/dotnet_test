@@ -39,7 +39,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests and Transfer Image') {
             stage ('Client Tests') {
                 steps {
                     echo 'Running client Tests'
@@ -65,7 +64,7 @@ pipeline {
                 }
             }
         }
-    }
+    
     post {
         always {
             echo 'send discord notification'
